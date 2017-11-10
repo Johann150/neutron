@@ -3,7 +3,19 @@
 	"productName": "Neutron",
 	"description": "Zeichensoftware für Smartboards",
 	"version": "1.0.0",
-	"author": "Johann Galle",
+	"author": {
+		"name": "Johann Galle",
+		"email": "johann.galle@protonmail.com"
+	},
+	"license": "AGPL-3.0",
+	"repository":{
+		"type" : "git",
+		"url" : "http://github.com/Johann150/neutron-electron"
+	},
+	"bugs":{
+		"url" : "https://github.com/Johann150/neutron-electron/issues",
+		"email" : "johann.galle@protonmail.com"
+	},
 	"main": "main.js",
 	"scripts": {
 		"start": "electron .",
