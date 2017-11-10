@@ -8,7 +8,7 @@ var filePath;
 
 // main page javascript
 
-var image,activePath,redoStack,penColor,bgColor,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY;
+var image,activePath,redoStack,penColor,bgColor,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY,scale;
 
 function circle(ctx){
 	ctx.beginPath();
@@ -37,6 +37,8 @@ function resize(w,h){
 		// get context
 		context = canvas.getContext("2d");
 		// setup context
+		// reinstate scaling
+		context.scale(scale,scale);
 		// this enhances line drawing so there are no sudden gaps in the line
 		context.lineJoin="round";
 		context.lineCap="round";
@@ -61,6 +63,7 @@ function setup(){
 	drawing=false;
 	prevX=0;
 	prevY=0;
+	scale=1;
 	colorchooser=document.createElement('input');
 	colorchooser.type="color";
 	// initialize canvas and context
@@ -372,7 +375,9 @@ function fileSave(closing){
 					penWidth:penWidth,
 					penColor:penColor,
 					eraseWidth:eraseWidth,
-					redoStack:redoStack
+					redoStack:redoStack,
+					width:canvas.width,
+					height:canvas.height
 				};
 				fs.writeFile(f,JSON.stringify(data),(err)=>{
 					if(err){
@@ -425,11 +430,19 @@ function fileOpen(){
 		if(f.length!=='undefined'){
 			filePath=f[0];
 			var data=JSON.parse(fs.readFileSync(f[0]));
-			image=data.image;
 			if(data.bg=='transparent'){
 				bgTransClick();
 			}else{
 				bgColor=rgb2hex(data.bg);
+			}
+			image=data.image;
+			if(data.width!=canvas.width){
+				// adjust for different screen size
+				scale=canvas.width/data.width;
+				resize(canvas.width,data.height*scale);
+			}else if(data.height>canvas.height){
+				// canvas was enlarged downward
+				resize(canvs.width,data.height);
 			}
 			repaintAll();
 			redoStack=data.redoStack;
