@@ -171,9 +171,7 @@ function setup(){
 	};
 	canvas.ontouchcancel=document.onmouseup;
 	// save handler
-	document.getElementById("save-img").onclick=function(evt){
-		saveImg(document.getElementById("save-img"),evt);
-	};
+	document.getElementById("save-img").onclick=saveImg;
 	// key handlers
 	document.onkeyup=function(evt){
 		if(evt.keyCode==27){
