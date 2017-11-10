@@ -31,6 +31,18 @@
 		"win": {
 			"target": "portable",
 			"icon": "icon.ico"
+		},
+		"mac": {
+			"category":"public.app-category.education",
+			"icon":"icon.icns",
+			"target":"pkg"
+		},
+		"pkg":{
+			"license":"LICENSE.txt"
+		},
+		"linux":{
+			"synopsis":"Zeichensoftware für Smartboards",
+			"category":"Education"
 		}
 	}
 }
