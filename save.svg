@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<svg version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 512 512" style="enable-background:new 0 0 512 512;" xml:space="preserve">
+<polygon style="fill:#CDD6E0;" points="193.067,34.667 151.467,97.6 360.533,97.6 318.933,34.667 "/>
+<path style="fill:#40596B;" d="M117.333,64.533H74.667C69.333,64.533,64,68.8,64,75.2v26.667h64V74.133
+	C128,68.8,123.733,64.533,117.333,64.533z"/>
+<path style="fill:#F2F2F2;" d="M480,94.4H32c-18.133,0-32,13.867-32,32v318.933c0,18.133,13.867,32,32,32h448
+	c18.133,0,32-13.867,32-32V126.4C512,108.267,498.133,94.4,480,94.4z"/>
+<rect y="136" style="fill:#40596B;" width="512" height="297.6"/>
+<circle style="fill:#FFFFFF;" cx="256" cy="285.333" r="132.267"/>
+<circle style="fill:#84DBFF;" cx="256" cy="285.333" r="102.4"/>
+<circle style="fill:#54C0EB;" cx="256" cy="285.333" r="55.467"/>
+<g>
+	<circle style="fill:#FFFFFF;" cx="301.867" cy="259.733" r="25.6"/>
+	<circle style="fill:#FFFFFF;" cx="235.733" cy="300.267" r="10.667"/>
+</g>
+<circle style="fill:#FF7058;" cx="85.333" cy="204.267" r="21.333"/>
+</svg>

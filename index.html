@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Neutron</title>
+		<script src="draw.js"></script>
+		<link rel="icon" type="image/svg+xml" href="atoms.svg"/>
+		<link rel="stylesheet" type="text/css" href="index.css"/>
+	</head>
+	<body onload="setup();">
+		<aside id="toolbox">
+			<input type="radio" class="toggle" id="pen" name="drawing" checked data-old="true"/>
+			<label for="pen" onclick="penClick();"><img src="stift.svg" alt="&#10000;"/></label>
+			<input type="radio" class="toggle" id="erase" name="drawing"/>
+			<label for="erase" onclick="eraseClick();"><img src="schwamm.svg" alt="Schwamm"></label>
+			<input type="radio" class="toggle" id="bg-color" name="bg" checked data-old="true"/>
+			<label for="bg-color" onclick="bgColorClick();"><img src="bg.svg" alt="HG-Farbe"/></label>
+			<input type="radio" class="toggle" id="bg-trans" name="bg"/>
+			<label for="bg-trans" onclick="bgTransClick();"><img src="screen.svg" alt="transparenter Hintergrund"/></label>
+			<a id="save-img" href="#"><img src="save.svg" alt="Bild speichern"></a>
+			<input type="image" onclick="fileSave();" src="save2.svg" alt="Speichern"/>
+			<input type="image" onclick="fileOpen();" src="open.svg" alt="Öffnen"/>
+			<input type="image" onclick="undo();" id="undo" src="back.svg" alt="&#8630;"/>
+			<input type="image" onclick="redo();" id="redo" src="next.svg" alt="&#8631;"/>
+			<input type="range" id="stroke" min="1" max="50" value="1" onchange="strokeChange();"/>
+			<input type="image" onclick="down();" src="down.svg" alt="&dArr;"/>
+			<input type="image" onclick="quit();" src="exit.svg" alt="Beenden"/>
+		</aside>
+		<canvas id="canvas"></canvas>
+	</body>
+</html>
