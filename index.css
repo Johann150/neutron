@@ -9,6 +9,7 @@ html,body{
 body{
 	/* no horizontal but only vertical scrolling */
 	overflow-x:hidden;
+	overflow-y:scroll;
 	background-color:#063;
 	cursor: pointer;
 	-webkit-user-select: none;

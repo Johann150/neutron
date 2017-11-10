@@ -8,7 +8,7 @@ var filePath;
 
 // main page javascript
 
-var image,activePath,redoStack,penColor,bgColor,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY,scale;
+var image,activePath,redoStack,penColor,bgColor,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY;
 
 function circle(ctx){
 	ctx.beginPath();
@@ -37,8 +37,6 @@ function resize(w,h){
 		// get context
 		context = canvas.getContext("2d");
 		// setup context
-		// reinstate scaling
-		context.scale(scale,scale);
 		// this enhances line drawing so there are no sudden gaps in the line
 		context.lineJoin="round";
 		context.lineCap="round";
@@ -63,17 +61,16 @@ function setup(){
 	drawing=false;
 	prevX=0;
 	prevY=0;
-	scale=1;
 	colorchooser=document.createElement('input');
 	colorchooser.type="color";
 	// initialize canvas and context
-	resize(window.innerWidth,window.innerHeight);
+	resize(document.body.clientWidth,document.body.clientHeight);
 	context.lineWidth=penWidth;
 	context.clearRect(0,0,canvas.width,canvas.height);
 	// make sure canvas gets resized if window dimension changes
 	// but never reduce the canvas size
 	document.body.onresize=function(){
-		resize(Math.max(canvas.width,window.innerWidth),Math.max(canvas.height,window.innerHeight));
+		resize(document.body.clientWidth,Math.max(canvas.height,document.body.clientHeight));
 	};
 	// mouse handlers
 	canvas.onmousedown=function(evt){
@@ -200,22 +197,44 @@ function down(){
 	window.scrollTo(0,getScrollMaxY());
 }
 
-function saveImg(anchor,evt){
-	if(window.navigator.msSaveBlob){
-		window.navigator.msSaveBlob(canvas.msToBlob(), fileName);
-		evt.preventDefault();
-	}else{
-		var date=new Date();
-		var filename=date.getDate();
-		filename+="-";
-		filename+=date.getMonth()+1;
-		filename+="-";
-		filename+=date.getFullYear();
-		filename+=".png";
-		// TODO
-		// anchor.setAttribute('download', filename);
-		// anchor.setAttribute('href', canvas.toDataURL());
-	}
+function saveImg(){
+	var date=new Date();
+	let options={
+		title:'Als Bild speichern',
+		buttonLabel:'Speichern',
+		defaultPath:date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate(),
+		filters:[
+			{
+				name:'PNG-Bild',
+				extensions:['png']
+			},
+			{
+				name:'JPEG-Bild',
+				extensions:['jpg','jpeg']
+			}
+		]
+	};
+	dialog.showSaveDialog(options,(f)=>{
+		if(f===undefined){
+			return; // canceled
+		}
+		var fr = new FileReader();
+		var data = null;
+		fr.onload = () => {
+			data = fr.result;
+			fs.writeFile(f,data,(err)=>{
+				if(err){
+					alert('Beim speichern ist ein Fehler aufgetreten: '+err);
+				}
+			});
+		};
+		if(f.match(/\.png$/i)!==null){
+			// save as png
+			canvas.toBlob((blob)=>{fr.readAsArrayBuffer(blob);},'image/png');
+		}else if(f.match(/\.jpe?g$/i)!==null){
+			canvas.toBlob((blob)=>{fr.readAsArrayBuffer(blob);},'image/jpeg');
+		}
+	});
 }
 
 function undo(){
@@ -352,14 +371,26 @@ function bgTransClick(){
 
 function fileSave(closing){
 	var closing = (typeof closing !== 'undefined') ? closing : false;
+	var data={
+		image:image,
+		bg:document.body.style.backgroundColor,
+		penWidth:penWidth,
+		penColor:penColor,
+		eraseWidth:eraseWidth,
+		redoStack:redoStack,
+		width:canvas.width,
+		height:canvas.height
+	};
 	if(filePath===undefined){
+		var date=new Date();
 		let options={
 			title:'Tafelbild speichern',
 			buttonLabel:'Speichern',
+			defaultPath:date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate(),
 			filters:[
 				{
-					name:'Tafelbild',
-					extensions:['json']
+					name:'Neutron-Tafelbild',
+					extensions:['nbrd']
 				}
 			]
 		};
@@ -369,16 +400,6 @@ function fileSave(closing){
 			}
 			filePath=f;
 			if(filePath!==undefined){
-				var data={
-					image:image,
-					bg:rgb2hex(document.body.style.backgroundColor),
-					penWidth:penWidth,
-					penColor:penColor,
-					eraseWidth:eraseWidth,
-					redoStack:redoStack,
-					width:canvas.width,
-					height:canvas.height
-				};
 				fs.writeFile(f,JSON.stringify(data),(err)=>{
 					if(err){
 						alert("Beim speichern ist ein Fehler aufgetreten: "+err.message);
@@ -394,14 +415,6 @@ function fileSave(closing){
 			}
 		});
 	}else{
-		var data={
-			image:image,
-			bg:document.body.style.backgroundColor,
-			penWidth:penWidth,
-			penColor:penColor,
-			eraseWidth:eraseWidth,
-			redoStack:redoStack
-		};
 		fs.writeFile(filePath,JSON.stringify(data),(err)=>{
 			if(err){
 				alert("Beim speichern ist ein Fehler aufgetreten: "+err.message);
@@ -420,8 +433,8 @@ function fileOpen(){
 		buttonLabel:'Öffnen',
 		filters:[
 			{
-				name:'JSON',
-				extensions:['json']
+				name:'Neutron-Tafelbild',
+				extensions:['nbrd']
 			}
 		],
 		properties:['openFile']
@@ -436,16 +449,32 @@ function fileOpen(){
 				bgColor=rgb2hex(data.bg);
 			}
 			image=data.image;
+			if(image.length>0){
+				document.getElementById('undo').style.filter="";
+			}else{
+				document.getElementById('undo').style.filter="brightness(50%)";
+			}
 			if(data.width!=canvas.width){
 				// adjust for different screen size
-				scale=canvas.width/data.width;
-				resize(canvas.width,data.height*scale);
+				var imgScale=canvas.width/data.width;
+				for (var obj in image) {
+					for (var pt in obj.points) {
+						pt.x*=imgScale;
+						pt.y*=imgScale;
+					}
+				}
+				resize(canvas.width,Math.max(data.height*imgScale,canvas.height));
 			}else if(data.height>canvas.height){
 				// canvas was enlarged downward
-				resize(canvs.width,data.height);
+				resize(canvas.width,data.height);
 			}
 			repaintAll();
 			redoStack=data.redoStack;
+			if(redoStack.length>0){
+				document.getElementById('redo').style.filter="";
+			}else{
+				document.getElementById('redo').style.filter="brightness(50%)";
+			}
 			document.body.backgroundColor=bgColor;
 			penWidth=data.penWidth;
 			document.getElementById('stroke').value=penWidth;
