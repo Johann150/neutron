@@ -27,18 +27,22 @@ function ellipse(ctx,x,y,width,height){
 }
 
 function resize(w,h){
+	// get canvas
 	canvas = document.getElementById("canvas");
-	penWidth=1;
-	eraseWidth=50;
-	canvas.width=w;
-	canvas.height=h;
-	context = canvas.getContext("2d");
-	context.globalCompositeOperation = "destination-out";
-	context.fillStyle="#ffffff";
-	context.strokeStyle=penColor;
-	context.lineJoin="round";
-	context.lineCap="round";
-	repaintAll();
+	// check that the canvas isn't already in the right size
+	if(canvas.width!==w&&canvas.height!==h){
+		// resize canvas
+		canvas.width=w;
+		canvas.height=h;
+		// get context
+		context = canvas.getContext("2d");
+		// setup context
+		// this enhances line drawing so there are no sudden gaps in the line
+		context.lineJoin="round";
+		context.lineCap="round";
+		// image was destroyed when canvas was resized so we have to repaint it
+		repaintAll();
+	}
 }
 
 function setup(){
@@ -52,6 +56,7 @@ function setup(){
 	bgColor="#006633";
 	document.body.style.backgroundColor=bgColor;
 	penWidth=1;
+	eraseWidth=50;
 	document.getElementById('stroke').value=penWidth;
 	drawing=false;
 	prevX=0;
@@ -62,7 +67,7 @@ function setup(){
 	resize(window.innerWidth,window.innerHeight);
 	context.lineWidth=penWidth;
 	context.clearRect(0,0,canvas.width,canvas.height);
-	// make sure canvas gets resized if window dimensi
+	// make sure canvas gets resized if window dimension changes
 	// but never reduce the canvas size
 	document.body.onresize=function(){
 		resize(Math.max(canvas.width,window.innerWidth),Math.max(canvas.height,window.innerHeight));
@@ -111,13 +116,18 @@ function setup(){
 		}
 	};
 	canvas.onmouseup=function(evt){
-		context.moveTo(prevX,prevY);
-		prevX=evt.clientX - canvas.offsetLeft;
-		prevY=evt.clientY - canvas.offsetTop + window.scrollY;
-		activePath.points.push({
-			x:prevX,
-			y:prevY
-		});
+		if(typeof evt !== 'undefined'){
+			// this is a real mouse handler call
+			evt.stopPropagation();
+			evt.preventDefault();
+			context.moveTo(prevX,prevY);
+			prevX=evt.clientX - canvas.offsetLeft;
+			prevY=evt.clientY - canvas.offsetTop + window.scrollY;
+			activePath.points.push({
+				x:prevX,
+				y:prevY
+			});
+		}
 		// save what was drawn
 		image.push(activePath);
 		// display undo button as normal
@@ -129,16 +139,17 @@ function setup(){
 		context.lineTo(prevX,prevY);
 		context.stroke();
 		drawing=false;
-		// no further handling by document.onmouseup (if this is a real mouse event)
-		if(typeof evt.stopPropagation === 'function'){
-			evt.stopPropagation();
-			evt.preventDefault();
-		}
 	};
 	document.onmouseup=function(){
 		if(drawing){
+			// save what was drawn
 			image.push(activePath);
-
+			// display undo button as normal
+			document.getElementById('undo').style.filter="";
+			// user drew sth new so empty redoStack
+			redoStack=[];
+			// grey-out the redo button
+			document.getElementById('redo').style.filter="brightness(50%)";
 			drawing=false;
 		}
 	};
@@ -156,13 +167,7 @@ function setup(){
 	canvas.ontouchend=function(evt){
 		evt.preventDefault();
 		evt.stopPropagation();
-		canvas.onmouseup(evt.touches[0]);
-		// activePath.points.push({
-			// x:prevX,
-			// y:prevY
-		// });
-		// image.push(activePath);
-		// drawing=false;
+		canvas.onmouseup();
 	};
 	canvas.ontouchcancel=document.onmouseup;
 	// save handler
@@ -208,8 +213,9 @@ function saveImg(anchor,evt){
 		filename+="-";
 		filename+=date.getFullYear();
 		filename+=".png";
-		anchor.setAttribute('download', filename);
-		anchor.setAttribute('href', canvas.toDataURL());
+		// TODO
+		// anchor.setAttribute('download', filename);
+		// anchor.setAttribute('href', canvas.toDataURL());
 	}
 }
 
