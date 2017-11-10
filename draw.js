@@ -358,7 +358,7 @@ function fileSave(closing){
 			buttonLabel:'Speichern',
 			filters:[
 				{
-					name:'JSON',
+					name:'Tafelbild',
 					extensions:['json']
 				}
 			]
