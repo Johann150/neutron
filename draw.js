@@ -30,7 +30,7 @@ function resize(w,h){
 	// get canvas
 	canvas = document.getElementById("canvas");
 	// check that the canvas isn't already in the right size
-	if(canvas.width!==w&&canvas.height!==h){
+	if(canvas.width!==w||canvas.height!==h){
 		// resize canvas
 		canvas.width=w;
 		canvas.height=h;
@@ -173,8 +173,6 @@ function setup(){
 	// save handler
 	document.getElementById("save-img").onclick=function(evt){
 		saveImg(document.getElementById("save-img"),evt);
-		evt.preventDefault();
-		evt.stopPropagation();
 	};
 	// key handlers
 	document.onkeyup=function(evt){
