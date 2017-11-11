@@ -8,7 +8,7 @@ var filePath;
 
 // main page javascript
 
-var image,activePath,redoStack,penColor,bgColor,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY;
+var image,activePath,redoStack,penColor,bgColor,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY,saved;
 
 function circle(ctx){
 	ctx.beginPath();
@@ -54,13 +54,14 @@ function setup(){
 	redoStack=[]
 	penColor="#ffffff";
 	bgColor="#006633";
-	document.body.style.backgroundColor=bgColor;
-	penWidth=1;
+	document.body.style.background=bgColor;
+	penWidth=2;
 	eraseWidth=50;
 	document.getElementById('stroke').value=penWidth;
 	drawing=false;
 	prevX=0;
 	prevY=0;
+	saved=true;
 	colorchooser=document.createElement('input');
 	colorchooser.type="color";
 	// initialize canvas and context
@@ -82,7 +83,7 @@ function setup(){
 		}else{
 			context.globalCompositeOperation="source-over";
 			context.strokeStyle=penColor;
-			context.lineWidth=penWidth+1;
+			context.lineWidth=penWidth;
 		}
 		activePath={
 			color:context.strokeStyle,
@@ -117,7 +118,7 @@ function setup(){
 	};
 	canvas.onmouseup=function(evt){
 		if(typeof evt !== 'undefined'){
-			// this is a real mouse handler call
+			// this is a real mouse handler call and not a delegation from the touch handler
 			evt.stopPropagation();
 			evt.preventDefault();
 			context.moveTo(prevX,prevY);
@@ -130,6 +131,7 @@ function setup(){
 		}
 		// save what was drawn
 		image.push(activePath);
+		saved=false;
 		// display undo button as normal
 		document.getElementById('undo').style.filter="";
 		// user drew sth new so empty redoStack
@@ -144,6 +146,7 @@ function setup(){
 		if(drawing){
 			// save what was drawn
 			image.push(activePath);
+			saved=false;
 			// display undo button as normal
 			document.getElementById('undo').style.filter="";
 			// user drew sth new so empty redoStack
@@ -193,6 +196,7 @@ function setup(){
 function down(){
 	if(window.scrollY>=getScrollMaxY()){
 		resize(canvas.width,canvas.height+100);
+		saved=false;
 	}
 	window.scrollTo(0,getScrollMaxY());
 }
@@ -232,6 +236,7 @@ function saveImg(){
 			// save as png
 			canvas.toBlob((blob)=>{fr.readAsArrayBuffer(blob);},'image/png');
 		}else if(f.match(/\.jpe?g$/i)!==null){
+			// save as jpg
 			canvas.toBlob((blob)=>{fr.readAsArrayBuffer(blob);},'image/jpeg');
 		}
 	});
@@ -240,6 +245,7 @@ function saveImg(){
 function undo(){
 	if(image.length>0){
 		redoStack.push(image.pop());
+		saved=false;
 		document.getElementById('redo').style.filter="";
 	}
 	repaintAll();
@@ -251,6 +257,7 @@ function undo(){
 function redo(){
 	if(redoStack.length>0){
 		image.push(redoStack.pop());
+		saved=false;
 		document.getElementById('undo').style.filter="";
 	}
 	repaintAll();
@@ -310,6 +317,7 @@ function penClick(){
 		colorchooser.value=context.strokeStyle;
 		colorchooser.onchange=function(evt){
 			penColor=colorchooser.value;
+			saved=false;
 		};
 		colorchooser.click();
 	}else{
@@ -332,48 +340,46 @@ function strokeChange(){
 	}else{
 		penWidth=stroke;
 	}
+	saved=false;
 }
-
 
 function rgb2hex(rgb){
 	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
 	return (rgb && rgb.length === 4) ? "#" +
 		("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
 		("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : '';
+		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : rgb;
 }
 
 function bgColorClick(){
 	var btn=document.getElementById('bg-color');
 	if(btn.getAttribute('data-old')=='true'){
 		// background-color was already activated, user wants to change color
-		bgColorChange();
-		bgColor=colorchooser.value;
+		colorchooser.value=rgb2hex(document.body.style.backgroundColor);
+		colorchooser.onchange=function(){
+			document.body.style.background=colorchooser.value;
+			bgColor=colorchooser.value;
+			saved=false;
+		};
+		colorchooser.click();
 	}else{
-		// only activate pen
+		// only activate normal background
 		btn.setAttribute('data-old','true');
 		document.body.style.background=bgColor;
 	}
 }
 
-function bgColorChange(){
-	colorchooser.value=rgb2hex(document.body.style.backgroundColor);
-	colorchooser.onchange=function(){
-		document.body.style.background=colorchooser.value;
-	};
-	colorchooser.click();
-}
-
 function bgTransClick(){
 	document.getElementById('bg-color').setAttribute('data-old','false');
 	document.body.style.background="transparent";
+	saved=false;
 }
 
 function fileSave(closing){
 	var closing = (typeof closing !== 'undefined') ? closing : false;
 	var data={
 		image:image,
-		bg:document.body.style.backgroundColor,
+		bg:document.body.style.background,
 		penWidth:penWidth,
 		penColor:penColor,
 		eraseWidth:eraseWidth,
@@ -407,6 +413,7 @@ function fileSave(closing){
 					}else{
 						// saving done sucessfully.
 						// If we have to, we can now close the window without any fear of data loss.
+						saved=true;
 						if(closing){
 							window.close();
 						}
@@ -475,12 +482,13 @@ function fileOpen(){
 			}else{
 				document.getElementById('redo').style.filter="brightness(50%)";
 			}
-			document.body.backgroundColor=bgColor;
+			document.body.style.background=bgColor;
 			penWidth=data.penWidth;
 			document.getElementById('stroke').value=penWidth;
 			penColor=data.penColor;
 			context.strokeStyle=penColor;
 			eraseWidth=data.eraseWidth;
+			saved=true;
 		}
 	});
 }
@@ -495,7 +503,7 @@ function quit(){
 		cancelId:2,
 		defaultId:2
 	};
-	if(image.length>0||redoStack.length>0){
+	if(!saved){
 		dialog.showMessageBox(options,(btnCode)=>{
 			switch (btnCode) {
 				case 0:

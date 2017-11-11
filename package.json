@@ -8,13 +8,13 @@
 		"email": "johann.galle@protonmail.com"
 	},
 	"license": "AGPL-3.0",
-	"repository":{
-		"type" : "git",
-		"url" : "http://github.com/Johann150/neutron-electron"
+	"repository": {
+		"type": "git",
+		"url": "http://github.com/Johann150/neutron-electron"
 	},
-	"bugs":{
-		"url" : "https://github.com/Johann150/neutron-electron/issues",
-		"email" : "johann.galle@protonmail.com"
+	"bugs": {
+		"url": "https://github.com/Johann150/neutron-electron/issues",
+		"email": "johann.galle@protonmail.com"
 	},
 	"main": "main.js",
 	"scripts": {
@@ -33,16 +33,16 @@
 			"icon": "icon.ico"
 		},
 		"mac": {
-			"category":"public.app-category.education",
-			"icon":"icon.icns",
-			"target":"pkg"
+			"category": "public.app-category.education",
+			"icon": "icon.icns",
+			"target": "pkg"
 		},
-		"pkg":{
-			"license":"LICENSE.txt"
+		"pkg": {
+			"license": "LICENSE.txt"
 		},
-		"linux":{
-			"synopsis":"Zeichensoftware für Smartboards",
-			"category":"Education"
+		"linux": {
+			"synopsis": "Zeichensoftware für Smartboards",
+			"category": "Education"
 		}
 	}
 }
