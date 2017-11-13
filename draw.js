@@ -88,7 +88,7 @@ function setup(){
 	// make sure canvas gets resized if window dimension changes
 	// but never reduce the canvas size
 	document.body.onresize=function(){
-		resize(document.body.clientWidth,Math.max(canvas.height,document.body.clientHeight));
+		resize(Math.max(canvas.width,document.body.clientWidth),Math.max(canvas.height,document.body.clientHeight));
 	};
 	// mouse handlers
 	canvas.onmousedown=function(evt){
@@ -316,23 +316,7 @@ function repaintAll(){
 }
 
 function getScrollMaxY(){
-	var innerh;
-	if (window.innerHeight){
-		innerh = window.innerHeight;
-	}else{
-		innerh = document.body.clientHeight;
-	}
-	if (window.innerHeight && window.scrollMaxY){
-		// Firefox
-		yWithScroll = window.innerHeight + window.scrollMaxY;
-	} else if (document.body.scrollHeight > document.body.offsetHeight){
-		// all but Explorer Mac
-		yWithScroll = document.body.scrollHeight;
-	} else {
-		// works in Explorer 6 Strict, Mozilla (not FF) and Safari
-		yWithScroll = document.body.offsetHeight;
-	}
-	return yWithScroll-innerh;
+	return document.body.scrollHeight-document.body.clientHeight;
 }
 
 function penClick(){
@@ -451,6 +435,7 @@ function fileSave(closing){
 			if(err){
 				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
 			}else{
+				saved=true;
 				if(closing){
 					window.close();
 				}
@@ -533,7 +518,7 @@ function fileRead(f){
 				pt.y*=imgScale;
 			}
 		}
-		resize(canvas.width,Math.max(data.height*imgScale,canvas.height));
+		resize(canvas.width,Math.max(data.height,data.height*imgScale));
 	}else if(data.height>canvas.height){
 		// canvas was enlarged downward
 		resize(canvas.width,data.height);
