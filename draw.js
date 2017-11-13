@@ -1,7 +1,8 @@
 // electron stuff
 
 const fs=require('fs');
-const {remote} = require('electron');
+const path=require('path');
+const {remote,shell} = require('electron');
 const {dialog} = require('electron').remote;
 
 var filePath;
@@ -49,6 +50,22 @@ function setup(){
 	// grey-out undo and redo buttons
 	document.getElementById('undo').style.filter="brightness(50%)";
 	document.getElementById('redo').style.filter="brightness(50%)";
+	// enable file drag'n'drop
+	document.body.ondragover = () => {return false;};
+	document.body.ondragleave = () => {return false;};
+	document.body.ondragend = () => {return false;};
+	document.body.ondrop = (e) => {
+		e.preventDefault();
+		e.stopPropagation();
+		for (let f of e.dataTransfer.files) {
+			if(f.path.endsWith('.nbrd')){
+				console.log(f.path);
+			}else{
+				shell.beep();
+			}
+		}
+		return false;
+	};
 	// initialize variables
 	image=[];
 	redoStack=[]
@@ -191,6 +208,53 @@ function setup(){
 			remote.getCurrentWebContents().toggleDevTools();
 		}
 	};
+	// look for default template file
+	fs.stat(path.join(process.cwd(),'template.nbrd'),(err, stat)=>{
+		if(err==null){
+			// file exists
+			var f=path.join(process.cwd(),'template.nbrd');
+			var data=JSON.parse(fs.readFileSync(f));
+			if(data.bg=='transparent'){
+				bgTransClick();
+			}else{
+				bgColor=rgb2hex(data.bg);
+			}
+			image=data.image;
+			if(image.length>0){
+				document.getElementById('undo').style.filter="";
+			}else{
+				document.getElementById('undo').style.filter="brightness(50%)";
+			}
+			if(data.width!=canvas.width){
+				// adjust for different screen size
+				var imgScale=canvas.width/data.width;
+				for (var obj in image) {
+					for (var pt in obj.points) {
+						pt.x*=imgScale;
+						pt.y*=imgScale;
+					}
+				}
+				resize(canvas.width,Math.max(data.height*imgScale,canvas.height));
+			}else if(data.height>canvas.height){
+				// canvas was enlarged downward
+				resize(canvas.width,data.height);
+			}
+			repaintAll();
+			redoStack=data.redoStack;
+			if(redoStack.length>0){
+				document.getElementById('redo').style.filter="";
+			}else{
+				document.getElementById('redo').style.filter="brightness(50%)";
+			}
+			document.body.style.background=bgColor;
+			penWidth=data.penWidth;
+			document.getElementById('stroke').value=penWidth;
+			penColor=data.penColor;
+			context.strokeStyle=penColor;
+			eraseWidth=data.eraseWidth;
+			saved=true;
+		}
+	});
 }
 
 function down(){
@@ -392,7 +456,7 @@ function fileSave(closing){
 		let options={
 			title:'Tafelbild speichern',
 			buttonLabel:'Speichern',
-			defaultPath:date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate(),
+			defaultPath:path.join(process.cwd(),date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate()+'.nbrd'),
 			filters:[
 				{
 					name:'Neutron-Tafelbild',
@@ -437,6 +501,7 @@ function fileSave(closing){
 function fileOpen(){
 	let options={
 		title:'Tafelbild öffnen',
+		defaultPath: process.cwd(),
 		buttonLabel:'Öffnen',
 		filters:[
 			{
