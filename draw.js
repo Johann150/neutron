@@ -57,7 +57,7 @@ function setup(){
 	document.body.ondrop = (e) => {
 		e.preventDefault();
 		e.stopPropagation();
-		for (let f of e.dataTransfer.files) {
+		for(let f of e.dataTransfer.files){
 			if(f.path.endsWith('.nbrd')){
 				console.log(f.path);
 			}else{
@@ -433,7 +433,7 @@ function fileSave(closing){
 			if(filePath!==undefined){
 				fs.writeFile(f,JSON.stringify(data),(err)=>{
 					if(err){
-						alert("Beim speichern ist ein Fehler aufgetreten: "+err.message);
+						alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
 						// we don't want to close the program if there was an error
 					}else{
 						// saving done sucessfully.
@@ -449,7 +449,7 @@ function fileSave(closing){
 	}else{
 		fs.writeFile(filePath,JSON.stringify(data),(err)=>{
 			if(err){
-				alert("Beim speichern ist ein Fehler aufgetreten: "+err.message);
+				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
 			}else{
 				if(closing){
 					window.close();
