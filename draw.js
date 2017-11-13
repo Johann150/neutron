@@ -500,6 +500,38 @@ function quit(){
 }
 
 function fileRead(f){
+	if(!saved){
+		// there are unsaved changes
+		let options={
+			type:'question',
+			title:'Neutron',
+			message:'Vor dem Öffnen speichern?',
+			buttons:['Ja','Nein','Abbrechen'],
+			// when hitting Esc, option 'Abbrechen' will be used
+			cancelId:2,
+			defaultId:2
+		};
+		dialog.showMessageBox(options,(btnCode)=>{
+			switch (btnCode) {
+				case 0:
+					// save
+					fileSave();
+					filePath=f;
+					_fileRead(f);
+					break;
+				case 1:
+					// discard changes
+					_fileRead(f);
+					break;
+				case 3:
+					// cancel so do nothing
+					break;
+			}
+		});
+	}
+}
+
+function _fileRead(f){
 	var data=JSON.parse(fs.readFileSync(f));
 	if(data.bg=='transparent'){
 		bgTransClick();
