@@ -213,46 +213,7 @@ function setup(){
 		if(err==null){
 			// file exists
 			var f=path.join(process.cwd(),'template.nbrd');
-			var data=JSON.parse(fs.readFileSync(f));
-			if(data.bg=='transparent'){
-				bgTransClick();
-			}else{
-				bgColor=rgb2hex(data.bg);
-			}
-			image=data.image;
-			if(image.length>0){
-				document.getElementById('undo').style.filter="";
-			}else{
-				document.getElementById('undo').style.filter="brightness(50%)";
-			}
-			if(data.width!=canvas.width){
-				// adjust for different screen size
-				var imgScale=canvas.width/data.width;
-				for (var obj in image) {
-					for (var pt in obj.points) {
-						pt.x*=imgScale;
-						pt.y*=imgScale;
-					}
-				}
-				resize(canvas.width,Math.max(data.height*imgScale,canvas.height));
-			}else if(data.height>canvas.height){
-				// canvas was enlarged downward
-				resize(canvas.width,data.height);
-			}
-			repaintAll();
-			redoStack=data.redoStack;
-			if(redoStack.length>0){
-				document.getElementById('redo').style.filter="";
-			}else{
-				document.getElementById('redo').style.filter="brightness(50%)";
-			}
-			document.body.style.background=bgColor;
-			penWidth=data.penWidth;
-			document.getElementById('stroke').value=penWidth;
-			penColor=data.penColor;
-			context.strokeStyle=penColor;
-			eraseWidth=data.eraseWidth;
-			saved=true;
+			fileRead(f);
 		}
 	});
 }
@@ -514,46 +475,7 @@ function fileOpen(){
 	dialog.showOpenDialog(options,(f)=>{
 		if(f.length!=='undefined'){
 			filePath=f[0];
-			var data=JSON.parse(fs.readFileSync(f[0]));
-			if(data.bg=='transparent'){
-				bgTransClick();
-			}else{
-				bgColor=rgb2hex(data.bg);
-			}
-			image=data.image;
-			if(image.length>0){
-				document.getElementById('undo').style.filter="";
-			}else{
-				document.getElementById('undo').style.filter="brightness(50%)";
-			}
-			if(data.width!=canvas.width){
-				// adjust for different screen size
-				var imgScale=canvas.width/data.width;
-				for (var obj in image) {
-					for (var pt in obj.points) {
-						pt.x*=imgScale;
-						pt.y*=imgScale;
-					}
-				}
-				resize(canvas.width,Math.max(data.height*imgScale,canvas.height));
-			}else if(data.height>canvas.height){
-				// canvas was enlarged downward
-				resize(canvas.width,data.height);
-			}
-			repaintAll();
-			redoStack=data.redoStack;
-			if(redoStack.length>0){
-				document.getElementById('redo').style.filter="";
-			}else{
-				document.getElementById('redo').style.filter="brightness(50%)";
-			}
-			document.body.style.background=bgColor;
-			penWidth=data.penWidth;
-			document.getElementById('stroke').value=penWidth;
-			penColor=data.penColor;
-			context.strokeStyle=penColor;
-			eraseWidth=data.eraseWidth;
-			saved=true;
+			fileRead(filePath);
 		}
 	});
 }
@@ -587,4 +509,47 @@ function quit(){
 		// nothing too important to save
 		window.close();
 	}
+}
+
+function fileRead(file){
+	var data=JSON.parse(fs.readFileSync(f[0]));
+	if(data.bg=='transparent'){
+		bgTransClick();
+	}else{
+		bgColor=rgb2hex(data.bg);
+	}
+	image=data.image;
+	if(image.length>0){
+		document.getElementById('undo').style.filter="";
+	}else{
+		document.getElementById('undo').style.filter="brightness(50%)";
+	}
+	if(data.width!=canvas.width){
+		// adjust for different screen size
+		var imgScale=canvas.width/data.width;
+		for (var obj in image) {
+			for (var pt in obj.points) {
+				pt.x*=imgScale;
+				pt.y*=imgScale;
+			}
+		}
+		resize(canvas.width,Math.max(data.height*imgScale,canvas.height));
+	}else if(data.height>canvas.height){
+		// canvas was enlarged downward
+		resize(canvas.width,data.height);
+	}
+	repaintAll();
+	redoStack=data.redoStack;
+	if(redoStack.length>0){
+		document.getElementById('redo').style.filter="";
+	}else{
+		document.getElementById('redo').style.filter="brightness(50%)";
+	}
+	document.body.style.background=bgColor;
+	penWidth=data.penWidth;
+	document.getElementById('stroke').value=penWidth;
+	penColor=data.penColor;
+	context.strokeStyle=penColor;
+	eraseWidth=data.eraseWidth;
+	saved=true;
 }
