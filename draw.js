@@ -511,8 +511,6 @@ function quit(){
 	}
 }
 
-function fileRead(file){
-	var data=JSON.parse(fs.readFileSync(f[0]));
 	if(data.bg=='transparent'){
 		bgTransClick();
 	}else{
