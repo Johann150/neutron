@@ -59,9 +59,11 @@ function setup(){
 		e.stopPropagation();
 		for(let f of e.dataTransfer.files){
 			if(f.path.endsWith('.nbrd')){
-				console.log(f.path);
-			}else{
-				shell.beep();
+				// file has right file extension so open it
+				filePath=f.path;
+				fileRead(filePath);
+				// there can't be multiple files open so stop when the first valid one is found
+				break;
 			}
 		}
 		return false;
