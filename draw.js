@@ -468,16 +468,16 @@ function fileOpen(){
 }
 
 function quit(){
-	let options={
-		type:'question',
-		title:'Neutron',
-		message:'Vor dem Beenden speichern?',
-		buttons:['Ja','Nein','Abbrechen'],
-		// when hitting Esc, option 'Abbrechen' will be used
-		cancelId:2,
-		defaultId:2
-	};
 	if(!saved){
+		let options={
+			type:'question',
+			title:'Neutron',
+			message:'Vor dem Beenden speichern?',
+			buttons:['Ja','Nein','Abbrechen'],
+			// when hitting Esc, option 'Abbrechen' will be used
+			cancelId:2,
+			defaultId:2
+		};
 		dialog.showMessageBox(options,(btnCode)=>{
 			switch (btnCode) {
 				case 0:
@@ -487,6 +487,7 @@ function quit(){
 				case 1:
 					// don't save, just exit
 					window.close();
+					break;
 				case 3:
 					// cancel so do nothing
 					break;
