@@ -46,6 +46,10 @@ function createWindow () {
 		mainWindow.show();
 		mainWindow.maximize();
 	});
+
+	mainWindow.on('focus',()=>{
+		mainWindow.webContents.executeJavaScript('repaintAll()');
+	});
 }
 
 // This method will be called when Electron has finished
