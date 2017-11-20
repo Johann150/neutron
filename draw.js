@@ -259,6 +259,12 @@ function saveImg(){
 				}
 			});
 		};
+		// prepare image export by repainting
+		repaintAll();
+		// add the background
+		context.globalCompositeOperation='destination-over';
+		context.fillStyle=bgColor;
+		context.fillRect(0,0,canvas.width,canvas.height);
 		if(f.match(/\.png$/i)!==null){
 			// save as png
 			canvas.toBlob((blob)=>{fr.readAsArrayBuffer(blob);},'image/png');
