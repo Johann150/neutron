@@ -2,7 +2,7 @@
 
 const fs=require('fs');
 const path=require('path');
-const {remote,shell} = require('electron');
+const {remote,shell,nativeImage} = require('electron');
 const {dialog} = require('electron').remote;
 
 var filePath;
@@ -249,23 +249,35 @@ function saveImg(){
 		if(f===undefined){
 			return; // canceled
 		}
-		var fr = new FileReader();
-		var data = null;
-		fr.onload = () => {
-			data = fr.result;
-			fs.writeFile(f,data,(err)=>{
-				if(err){
-					alert('Beim speichern ist ein Fehler aufgetreten: '+err);
-				}
-			});
-		};
+		// prepare image export by repainting
+		repaintAll();
+		// add the background
+		context.globalCompositeOperation='destination-over';
+		context.fillStyle=bgColor;
+		context.fillRect(0,0,canvas.width,canvas.height);
+		var data;
 		if(f.match(/\.png$/i)!==null){
-			// save as png
-			canvas.toBlob((blob)=>{fr.readAsArrayBuffer(blob);},'image/png');
+			// get png data
+			data=canvas.toDataURL('image/png');
 		}else if(f.match(/\.jpe?g$/i)!==null){
-			// save as jpg
-			canvas.toBlob((blob)=>{fr.readAsArrayBuffer(blob);},'image/jpeg');
+			// get jpg data
+			data=canvas.toDataURL('image/jpeg');
 		}
+		var img = typeof nativeImage.createFromDataURL === 'function'
+		? nativeImage.createFromDataURL(data)  // electron v0.36+
+		: nativeImage.createFromDataUrl(data); // electron v0.30
+		if(f.match(/\.png$/i)!==null){
+			// get png data
+			data=img.toPng();
+		}else if(f.match(/\.jpe?g$/i)!==null){
+			// get jpg data
+			data=img.toJpeg(1);
+		}
+		fs.writeFile(f,data,(err)=>{
+			if(err){
+				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
+			}
+		});
 	});
 }
 
