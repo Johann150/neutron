@@ -24,7 +24,8 @@ function createWindow () {
 		show: false,
 		title: "Neutron",
 		transparent: true,
-		frame: false
+		frame: false,
+		resizable: false
 	});
 
 	// and load the index.html of the app.
