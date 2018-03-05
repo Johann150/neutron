@@ -376,7 +376,7 @@ function bgColorClick(){
 	}
 }
 
-function bgTransClick(){
+function bgImgClick(){
 	document.getElementById('bg-color').setAttribute('data-old','false');
 	document.body.style.background="transparent";
 	saved=false;
