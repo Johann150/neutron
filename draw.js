@@ -9,7 +9,7 @@ var filePath;
 
 // main page javascript
 
-var image,activePath,redoStack,penColor,bgColor,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY,saved;
+var image,activePath,redoStack,penColor,bgColor,bgImg,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY,saved;
 
 function resize(w,h){
 	// get canvas
@@ -57,6 +57,7 @@ function setup(){
 	redoStack=[]
 	penColor="#ffffff";
 	bgColor="#006633";
+	bgImg=null;
 	document.body.style.background=bgColor;
 	penWidth=2;
 	eraseWidth=50;
@@ -377,8 +378,36 @@ function bgColorClick(){
 }
 
 function bgImgClick(){
-	document.getElementById('bg-color').setAttribute('data-old','false');
-	document.body.style.background="transparent";
+	var btn=document.getElementById('bg-color');
+	if(btn.getAttribute('data-old')=='false'||bgImg==null){
+		// change image
+		let options={
+			title:'Hintergrundbild öffnen',
+			defaultPath: process.cwd(),
+			buttonLabel:'Öffnen',
+			filters:[
+				{
+					name:'PNG-Bild',
+					extensions:['png']
+				},
+				{
+					name:'JPEG-Bild',
+					extensions:['jpg','jpeg']
+				}
+			]
+			properties:['openFile']
+		};
+		dialog.showOpenDialog(options,(f)=>{
+			if(f.length!=='undefined'){
+				filePath=f[0];
+
+			}
+		});
+	}else{
+		// only activate background image
+		btn.setAttribute('data-old','false');
+		document.body.style.background="url:";
+	}
 	saved=false;
 }
 
