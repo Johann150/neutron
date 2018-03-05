@@ -11,22 +11,6 @@ var filePath;
 
 var image,activePath,redoStack,penColor,bgColor,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY,saved;
 
-function circle(ctx){
-	ctx.beginPath();
-	ctx.arc(400,400,100,0,2*Math.PI);
-	ctx.stroke();
-}
-
-function ellipse(ctx,x,y,width,height){
-	ctx.save();
-	ctx.beginPath();
-	ctx.translate(x-width, y-height);
-	ctx.scale(width, height);
-	ctx.arc(1, 1, 1, 0, 2 * Math.PI, false);
-	ctx.restore();
-	ctx.stroke();
-}
-
 function resize(w,h){
 	// get canvas
 	canvas = document.getElementById("canvas");
