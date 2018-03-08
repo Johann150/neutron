@@ -413,13 +413,22 @@ function bgImgClick(){
 		dialog.showOpenDialog(options,(f)=>{
 			if(typeof f!=='undefined'){
 				filePath=f[0];
-
+				var img = new Image();
+				img.onload=function(){
+					var canv=document.createElement('canvas');
+					canv.width=this.naturalWidth;
+					canv.height=this.naturalHeight;
+					canv.getContext('2d').drawImage(this,0,0);
+					bgImg=canv.toDataURL('image/png');
+					document.body.style.backgroundImage="url("+bgImg+")";
+				};
+				img.src=filePath;
 			}
 		});
 	}else{
 		// only activate background image
 		btn.setAttribute('data-old','false');
-		document.body.style.background="url:";
+		document.body.style.backgroundImage="url("+bgImg+")";
 	}
 	saved=false;
 }

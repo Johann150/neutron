@@ -11,6 +11,7 @@ body{
 	overflow-x:hidden;
 	overflow-y:scroll;
 	background-color:#063;
+	background-size: cover !important;
 	cursor: pointer;
 	-webkit-user-select: none;
 	user-select: none;
