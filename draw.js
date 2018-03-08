@@ -9,7 +9,21 @@ var filePath;
 
 // main page javascript
 
-var image,activePath,redoStack,penColor,bgColor,bgImg,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY,saved;
+var canvas; // main canvas for drawing
+var context; // 2d drawing context
+var image;
+var activePath;
+var redoStack;
+var penColor;
+var bgColor;
+var bgImg;
+var penWidth;
+var eraseWidth;
+var colorchooser;
+var drawing;
+var prevX;
+var prevY;
+var saved;
 
 function resize(w,h){
 	// get canvas
@@ -291,6 +305,9 @@ function redo(){
 }
 
 function repaintAll(){
+	if(typeof canvas == 'undefined'||typeof context == 'undefined'){
+		return;
+	}
 	// clear image
 	context.clearRect(0,0,canvas.width,canvas.height);
 	// paint all paths
@@ -387,18 +404,14 @@ function bgImgClick(){
 			buttonLabel:'Öffnen',
 			filters:[
 				{
-					name:'PNG-Bild',
-					extensions:['png']
-				},
-				{
-					name:'JPEG-Bild',
-					extensions:['jpg','jpeg']
+					name:'Bild',
+					extensions:['png','jpg','jpeg']
 				}
-			]
+			],
 			properties:['openFile']
 		};
 		dialog.showOpenDialog(options,(f)=>{
-			if(f.length!=='undefined'){
+			if(typeof f!=='undefined'){
 				filePath=f[0];
 
 			}
