@@ -68,6 +68,7 @@ function setup(){
 	};
 	// initialize variables
 	image=[];
+	activePath=null;
 	redoStack=[]
 	penColor="#ffffff";
 	bgColor="#006633";
@@ -135,7 +136,7 @@ function setup(){
 		}
 	};
 	canvas.onmouseup=function(evt){
-		if(typeof evt !== 'undefined'){
+		if(typeof evt !== 'undefined'&&activePath!=null){
 			// this is a real mouse handler call and not a delegation from the touch handler
 			evt.stopPropagation();
 			evt.preventDefault();
@@ -331,10 +332,6 @@ function repaintAll(){
 	}
 }
 
-function getScrollMaxY(){
-	return document.body.scrollHeight-document.body.clientHeight;
-}
-
 function penClick(){
 	var pen=document.getElementById('pen');
 	if(pen.getAttribute('data-old')=='true'){
@@ -366,14 +363,6 @@ function strokeChange(){
 		penWidth=stroke;
 	}
 	saved=false;
-}
-
-function rgb2hex(rgb){
-	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-	return (rgb && rgb.length === 4) ? "#" +
-		("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-		("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : rgb;
 }
 
 function bgColorClick(){
@@ -413,16 +402,30 @@ function bgImgClick(){
 		dialog.showOpenDialog(options,(f)=>{
 			if(typeof f!=='undefined'){
 				filePath=f[0];
+				fs.stat(filePath,(err, stat)=>{
+					if(err==null){
+						// file exists
+						console.log("background image file does exist:",filePath);
 				var img = new Image();
+						console.info(1);
 				img.onload=function(){
+							console.log("image loaded");
 					var canv=document.createElement('canvas');
 					canv.width=this.naturalWidth;
 					canv.height=this.naturalHeight;
 					canv.getContext('2d').drawImage(this,0,0);
 					bgImg=canv.toDataURL('image/png');
+							console.log("got image data-URL",bgImg);
 					document.body.style.backgroundImage="url("+bgImg+")";
 				};
-				img.src=filePath;
+						img.load(filePath);
+						console.info(2);
+						// img.src=filePath;
+						console.info(3);
+					}else{
+						console.error("background image file does not exist:",filePath);
+					}
+				});
 			}
 		});
 	}else{
