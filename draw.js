@@ -71,12 +71,6 @@ function setup(){
 	resize(document.body.clientWidth,document.body.clientHeight);
 	context.lineWidth=penWidth;
 	context.clearRect(0,0,canvas.width,canvas.height);
-	/*activePath={
-		color:context.strokeStyle,
-		gco:context.globalCompositeOperation,
-		width:context.lineWidth,
-		points:[]
-	};*/
 	// make sure canvas gets resized if window dimension changes
 	// but never reduce the canvas size
 	document.body.onresize=function(){
