@@ -524,6 +524,8 @@ function fileRead(f){
 					break;
 			}
 		});
+	}else{
+		_fileRead(f);
 	}
 }
 
