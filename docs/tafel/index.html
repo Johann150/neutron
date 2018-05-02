@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Neutron</title>
+		<script src="draw.js"></script>
+		<link rel="icon" type="image/svg+xml" href="atoms.svg"/>
+		<link rel="stylesheet" type="text/css" href="index.css"/>
+	</head>
+	<body onload="setup();">
+		<aside>
+			<input type="radio" class="toggle" id="pen" name="drawing" checked data-old="true"/>
+			<label for="pen" onclick="penClick();"><img src="stift.svg" alt="&#10000;"/></label>
+			<input type="radio" class="toggle" id="erase" name="drawing"/>
+			<label for="erase" onclick="eraseClick();"><img src="schwamm.svg" alt="Schwamm"></label>
+			<input type="image" id="bg" onclick="bgColorChange();" src="bg.svg" alt="HG-Farbe"/>
+			<a id="save" href="#"><img src="save.svg" alt="Speichern"></a>
+			<input type="image" onclick="undo();" id="undo" src="back.svg" alt="&#8630;"/>
+			<input type="image" onclick="redo();" id="redo" src="next.svg" alt="&#8631;"/>
+			<input type="range" id="stroke" min="1" max="50" value="1" onchange="strokeChange();"/>
+			<input type="image" onclick="down();" src="down.svg" alt="&dArr;"/>
+		</aside>
+		<canvas id="canvas"></canvas>
+	</body>
+</html>
