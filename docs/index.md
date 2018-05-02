@@ -1,3 +1,3 @@
 # Neutron
 
-find the online variant at [tafel](/tafel)
+find the online variant at [tafel](tafel)
