@@ -3,6 +3,7 @@
 	<head>
 		<meta charset="utf-8">
 		<title>Neutron</title>
+		<script src="lib.js"></script>
 		<script src="draw.js"></script>
 		<link rel="icon" type="image/svg+xml" href="atoms.svg"/>
 		<link rel="stylesheet" type="text/css" href="index.css"/>
@@ -14,9 +15,9 @@
 			<input type="radio" class="toggle" id="erase" name="drawing"/>
 			<label for="erase" onclick="eraseClick();"><img src="schwamm.svg" alt="Schwamm"></label>
 			<input type="radio" class="toggle" id="bg-color" name="bg" checked data-old="true"/>
-			<label for="bg-color" onclick="bgColorClick();"><img src="bg.svg" alt="HG-Farbe"/></label>
-			<input type="radio" class="toggle" id="bg-trans" name="bg"/>
-			<label for="bg-trans" onclick="bgTransClick();"><img src="screen.svg" alt="transparenter Hintergrund"/></label>
+			<label for="bg-color" onclick="bgColorClick();"><img src="bg.svg" alt="Hintergr.-Farbe"/></label>
+			<input type="radio" class="toggle" id="bg-img" name="bg"/>
+			<label for="bg-img" onclick="bgImgClick();"><img src="background.svg" alt="Hintergr.-Bild"/></label>
 			<a id="save-img" href="#"><img src="save.svg" alt="Bild speichern"></a>
 			<input type="image" onclick="fileSave();" src="save2.svg" alt="Speichern"/>
 			<input type="image" onclick="fileOpen();" src="open.svg" alt="Öffnen"/>

@@ -11,6 +11,7 @@ body{
 	overflow-x:hidden;
 	overflow-y:scroll;
 	background-color:#063;
+	background-size: cover !important;
 	cursor: pointer;
 	-webkit-user-select: none;
 	user-select: none;
@@ -52,12 +53,14 @@ aside div{
 	padding: 2px;
 	box-sizing: border-box;
 	overflow: hidden;
+	cursor:pointer;
 }
 #stroke{
 	width: auto;
 }
 canvas{
 	display: block;
+	cursor:url(pen.cur),crosshair;
 }
 .toggle{
 	display: none;

@@ -9,7 +9,21 @@ var filePath;
 
 // main page javascript
 
-var image,activePath,redoStack,penColor,bgColor,penWidth,eraseWidth,colorchooser,drawing,prevX,prevY,saved;
+var canvas; // main canvas for drawing
+var context; // 2d drawing context
+var image;
+var activePath;
+var redoStack;
+var penColor;
+var bgColor;
+var bgImg;
+var penWidth;
+var eraseWidth;
+var colorchooser;
+var drawing;
+var prevX;
+var prevY;
+var saved;
 
 function resize(w,h){
 	// get canvas
@@ -28,6 +42,17 @@ function resize(w,h){
 		// image was destroyed when canvas was resized so we have to repaint it
 		repaintAll();
 	}
+}
+
+function checkTemplateFile(){
+	var f=path.join(process.cwd(),'template.nbrd');
+	fs.stat(f,(err, stat)=>{
+		if(err==null){
+			// file exists
+			console.log("opening template file");
+			_fileRead(f);
+		}
+	});
 }
 
 function setup(){
@@ -54,9 +79,11 @@ function setup(){
 	};
 	// initialize variables
 	image=[];
+	activePath=null;
 	redoStack=[]
 	penColor="#ffffff";
 	bgColor="#006633";
+	bgImg=null;
 	document.body.style.background=bgColor;
 	penWidth=2;
 	eraseWidth=50;
@@ -120,7 +147,7 @@ function setup(){
 		}
 	};
 	canvas.onmouseup=function(evt){
-		if(typeof evt !== 'undefined'){
+		if(typeof evt !== 'undefined'&&activePath!=null){
 			// this is a real mouse handler call and not a delegation from the touch handler
 			evt.stopPropagation();
 			evt.preventDefault();
@@ -195,13 +222,11 @@ function setup(){
 		}
 	};
 	// look for default template file
-	fs.stat(path.join(process.cwd(),'template.nbrd'),(err, stat)=>{
-		if(err==null){
-			// file exists
-			var f=path.join(process.cwd(),'template.nbrd');
-			fileRead(f);
-		}
-	});
+	if(checkTemplateFile){
+		// this should only happen on startup
+		checkTemplateFile();
+		checkTemplateFile=false;
+	}
 }
 
 function down(){
@@ -290,12 +315,19 @@ function redo(){
 }
 
 function repaintAll(){
+	if(typeof canvas == 'undefined'||typeof context == 'undefined'){
+		return;
+	}
 	// clear image
 	context.clearRect(0,0,canvas.width,canvas.height);
 	// paint all paths
 	for(var i=0;i<image.length;i++){
 		context.beginPath();
 		var path=image[i];
+		if(path==null){
+			console.log(image);
+			continue;
+		}
 		// set appearance
 		context.strokeStyle=path.color;
 		context.lineWidth=path.width+1;
@@ -311,10 +343,6 @@ function repaintAll(){
 		// draw!
 		context.stroke();
 	}
-}
-
-function getScrollMaxY(){
-	return document.body.scrollHeight-document.body.clientHeight;
 }
 
 function penClick(){
@@ -350,14 +378,6 @@ function strokeChange(){
 	saved=false;
 }
 
-function rgb2hex(rgb){
-	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-	return (rgb && rgb.length === 4) ? "#" +
-		("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-		("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : rgb;
-}
-
 function bgColorClick(){
 	var btn=document.getElementById('bg-color');
 	if(btn.getAttribute('data-old')=='true'){
@@ -376,9 +396,56 @@ function bgColorClick(){
 	}
 }
 
-function bgTransClick(){
-	document.getElementById('bg-color').setAttribute('data-old','false');
-	document.body.style.background="transparent";
+function bgImgClick(){
+	var btn=document.getElementById('bg-color');
+	if(btn.getAttribute('data-old')=='false'||bgImg==null){
+		// change image
+		let options={
+			title:'Hintergrundbild öffnen',
+			defaultPath: process.cwd(),
+			buttonLabel:'Öffnen',
+			filters:[
+				{
+					name:'Bild',
+					extensions:['png','jpg','jpeg']
+				}
+			],
+			properties:['openFile']
+		};
+		dialog.showOpenDialog(options,(f)=>{
+			if(typeof f!=='undefined'){
+				var bgPath=f[0];
+				fs.stat(bgPath,(err, stat)=>{
+					if(err==null){
+						// file exists
+						var img = new Image();
+						img.onload=function(){
+							var canv=document.createElement('canvas');
+							if(this.naturalWidth>1600){
+								// if too big resize image so the data url does not get too large
+								canv.width=1600;
+								// resize appropriately
+								canv.height=this.naturalHeight*1600/this.naturalWidth;
+							}else{
+								canv.width=this.naturalWidth;
+								canv.height=this.naturalHeight;
+							}
+							canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
+							bgImg=canv.toDataURL('image/png');
+							document.body.style.background="";
+							document.body.style.backgroundImage="url("+bgImg+")";
+						};
+						img.src=bgPath;
+					}
+				});
+			}
+		});
+	}else{
+		// only activate background image
+		btn.setAttribute('data-old','false');
+		document.body.style.background="";
+		document.body.style.backgroundImage="url("+bgImg+")";
+	}
 	saved=false;
 }
 
@@ -530,17 +597,26 @@ function fileRead(f){
 }
 
 function _fileRead(f){
+	// reset everything
+	setup();
+	// load data
 	var data=JSON.parse(fs.readFileSync(f));
-	if(data.bg=='transparent'){
-		bgTransClick();
+	if(data.bg.startsWith('url(')){
+		// background image
+		bgImg=data.bg.substr(4);
+		bgImg=bgImg.substr(0,bgImg.length-1);
+		// switch on corresponding button
+		document.getElementById('bg-img').checked=true;
+		document.getElementById('bg-color').setAttribute('data-old','false');
 	}else{
 		bgColor=rgb2hex(data.bg);
 	}
-	image=data.image;
-	if(image.length>0){
-		document.getElementById('undo').style.filter="";
-	}else{
+	if(data.image==null){
+		image=[];
 		document.getElementById('undo').style.filter="brightness(50%)";
+	}else{
+		image=data.image;
+		document.getElementById('undo').style.filter="";
 	}
 	if(data.width!=canvas.width){
 		// adjust for different screen size
@@ -563,7 +639,12 @@ function _fileRead(f){
 	}else{
 		document.getElementById('redo').style.filter="brightness(50%)";
 	}
-	document.body.style.background=bgColor;
+	if(bgImg==null){
+		document.body.style.background=bgColor;
+	}else{
+		document.body.style.background="";
+		document.body.style.backgroundImage="url("+bgImg+")";
+	}
 	penWidth=data.penWidth;
 	document.getElementById('stroke').value=penWidth;
 	penColor=data.penColor;
