@@ -44,6 +44,17 @@ function resize(w,h){
 	}
 }
 
+function checkTemplateFile(){
+	var f=path.join(process.cwd(),'template.nbrd');
+	fs.stat(f,(err, stat)=>{
+		if(err==null){
+			// file exists
+			console.log("opening template file");
+			_fileRead(f);
+		}
+	});
+}
+
 function setup(){
 	// grey-out undo and redo buttons
 	document.getElementById('undo').style.filter="brightness(50%)";
@@ -211,13 +222,11 @@ function setup(){
 		}
 	};
 	// look for default template file
-	fs.stat(path.join(process.cwd(),'template.nbrd'),(err, stat)=>{
-		if(err==null){
-			// file exists
-			var f=path.join(process.cwd(),'template.nbrd');
-			fileRead(f);
-		}
-	});
+	if(checkTemplateFile){
+		// this should only happen on startup
+		checkTemplateFile();
+		checkTemplateFile=false;
+	}
 }
 
 function down(){
@@ -315,6 +324,10 @@ function repaintAll(){
 	for(var i=0;i<image.length;i++){
 		context.beginPath();
 		var path=image[i];
+		if(path==null){
+			console.log(image);
+			continue;
+		}
 		// set appearance
 		context.strokeStyle=path.color;
 		context.lineWidth=path.width+1;
@@ -401,29 +414,28 @@ function bgImgClick(){
 		};
 		dialog.showOpenDialog(options,(f)=>{
 			if(typeof f!=='undefined'){
-				filePath=f[0];
-				fs.stat(filePath,(err, stat)=>{
+				var bgPath=f[0];
+				fs.stat(bgPath,(err, stat)=>{
 					if(err==null){
 						// file exists
-						console.log("background image file does exist:",filePath);
-				var img = new Image();
-						console.info(1);
-				img.onload=function(){
-							console.log("image loaded");
-					var canv=document.createElement('canvas');
-					canv.width=this.naturalWidth;
-					canv.height=this.naturalHeight;
-					canv.getContext('2d').drawImage(this,0,0);
-					bgImg=canv.toDataURL('image/png');
-							console.log("got image data-URL",bgImg);
-					document.body.style.backgroundImage="url("+bgImg+")";
-				};
-						img.load(filePath);
-						console.info(2);
-						// img.src=filePath;
-						console.info(3);
-					}else{
-						console.error("background image file does not exist:",filePath);
+						var img = new Image();
+						img.onload=function(){
+							var canv=document.createElement('canvas');
+							if(this.naturalWidth>1600){
+								// if too big resize image so the data url does not get too large
+								canv.width=1600;
+								// resize appropriately
+								canv.height=this.naturalHeight*1600/this.naturalWidth;
+							}else{
+								canv.width=this.naturalWidth;
+								canv.height=this.naturalHeight;
+							}
+							canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
+							bgImg=canv.toDataURL('image/png');
+							document.body.style.background="";
+							document.body.style.backgroundImage="url("+bgImg+")";
+						};
+						img.src=bgPath;
 					}
 				});
 			}
@@ -431,6 +443,7 @@ function bgImgClick(){
 	}else{
 		// only activate background image
 		btn.setAttribute('data-old','false');
+		document.body.style.background="";
 		document.body.style.backgroundImage="url("+bgImg+")";
 	}
 	saved=false;
@@ -578,21 +591,32 @@ function fileRead(f){
 					break;
 			}
 		});
+	}else{
+		_fileRead(f);
 	}
 }
 
 function _fileRead(f){
+	// reset everything
+	setup();
+	// load data
 	var data=JSON.parse(fs.readFileSync(f));
-	if(data.bg=='transparent'){
-		bgTransClick();
+	if(data.bg.startsWith('url(')){
+		// background image
+		bgImg=data.bg.substr(4);
+		bgImg=bgImg.substr(0,bgImg.length-1);
+		// switch on corresponding button
+		document.getElementById('bg-img').checked=true;
+		document.getElementById('bg-color').setAttribute('data-old','false');
 	}else{
 		bgColor=rgb2hex(data.bg);
 	}
-	image=data.image;
-	if(image.length>0){
-		document.getElementById('undo').style.filter="";
-	}else{
+	if(data.image==null){
+		image=[];
 		document.getElementById('undo').style.filter="brightness(50%)";
+	}else{
+		image=data.image;
+		document.getElementById('undo').style.filter="";
 	}
 	if(data.width!=canvas.width){
 		// adjust for different screen size
@@ -615,7 +639,12 @@ function _fileRead(f){
 	}else{
 		document.getElementById('redo').style.filter="brightness(50%)";
 	}
-	document.body.style.background=bgColor;
+	if(bgImg==null){
+		document.body.style.background=bgColor;
+	}else{
+		document.body.style.background="";
+		document.body.style.backgroundImage="url("+bgImg+")";
+	}
 	penWidth=data.penWidth;
 	document.getElementById('stroke').value=penWidth;
 	penColor=data.penColor;
