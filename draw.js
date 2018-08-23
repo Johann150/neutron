@@ -2,39 +2,39 @@
 
 const fs=require('fs');
 const path=require('path');
-const {remote,shell,nativeImage} = require('electron');
-const {dialog} = require('electron').remote;
+const {remote,shell,nativeImage}=require('electron');
+const {dialog}=require('electron').remote;
 
-var filePath;
+var filePath; // file path to use for saving
 
 // main page javascript
 
 var canvas; // main canvas for drawing
 var context; // 2d drawing context
-var image;
-var activePath;
-var redoStack;
-var penColor;
-var bgColor;
-var bgImg;
-var penWidth;
-var eraseWidth;
-var colorchooser;
-var drawing;
-var prevX;
-var prevY;
-var saved;
+var image; // an array of former activePath's
+var activePath; // object storing information on how to recreate a certain drawing feature
+var redoStack; // array storing former activePath's that have been undone to be redone
+var penColor; // the current colour used to draw as a string (e.g. "#ffffff")
+var bgColor; // the current colour used for the background as a css value (e.g)
+var bgImg; // image data for a background image
+var penWidth; // width used to draw with the pen tool
+var eraseWidth; // width used to erase something; usually >penWidth
+var colorchooser; // DOM element: <input type="color">
+var drawing; // boolean, wether the user is drawing at the moment
+var prevX; // the previous x coordinate when drawing
+var prevY; // the previous y coordinate when drawing
+var saved; // boolean, wether the active state has been modified since the last save
 
 function resize(w,h){
 	// get canvas
-	canvas = document.getElementById("canvas");
+	canvas=document.getElementById("canvas");
 	// check that the canvas isn't already in the right size
 	if(canvas.width!==w||canvas.height!==h){
 		// resize canvas
 		canvas.width=w;
 		canvas.height=h;
 		// get context
-		context = canvas.getContext("2d");
+		context=canvas.getContext("2d");
 		// setup context
 		// this enhances line drawing so there are no sudden gaps in the line
 		context.lineJoin="round";
@@ -46,7 +46,7 @@ function resize(w,h){
 
 function checkTemplateFile(){
 	var f=path.join(process.cwd(),'template.nbrd');
-	fs.stat(f,(err, stat)=>{
+	fs.stat(f,(err,stat)=>{
 		if(err==null){
 			// file exists
 			console.log("opening template file");
@@ -60,10 +60,10 @@ function setup(){
 	document.getElementById('undo').style.filter="brightness(50%)";
 	document.getElementById('redo').style.filter="brightness(50%)";
 	// enable file drag'n'drop
-	document.body.ondragover = () => {return false;};
-	document.body.ondragleave = () => {return false;};
-	document.body.ondragend = () => {return false;};
-	document.body.ondrop = (e) => {
+	document.body.ondragover=()=>{return false;};
+	document.body.ondragleave=()=>{return false;};
+	document.body.ondragend=()=>{return false;};
+	document.body.ondrop=(e)=>{
 		e.preventDefault();
 		e.stopPropagation();
 		for(let f of e.dataTransfer.files){
@@ -108,7 +108,7 @@ function setup(){
 		context.beginPath();
 		if(document.getElementById("erase").checked){
 			context.globalCompositeOperation="destination-out";
-			context.strokeStyle = "rgba(0,0,0,1)";
+			context.strokeStyle="rgba(0,0,0,1)";
 			context.lineWidth=eraseWidth;
 		}else{
 			context.globalCompositeOperation="source-over";
@@ -122,8 +122,8 @@ function setup(){
 			points:[]
 		};
 		drawing=true;
-		prevX=evt.clientX - canvas.offsetLeft;
-		prevY=evt.clientY - canvas.offsetTop + window.scrollY;
+		prevX=evt.clientX-canvas.offsetLeft;
+		prevY=evt.clientY-canvas.offsetTop+window.scrollY;
 		activePath.points.push({
 			x:prevX,
 			y:prevY
@@ -136,8 +136,8 @@ function setup(){
 	canvas.onmousemove=function(evt){
 		if(drawing){
 			context.moveTo(prevX,prevY);
-			prevX=evt.clientX - canvas.offsetLeft;
-			prevY=evt.clientY - canvas.offsetTop + window.scrollY;
+			prevX=evt.clientX-canvas.offsetLeft;
+			prevY=evt.clientY-canvas.offsetTop+window.scrollY;
 			activePath.points.push({
 				x:prevX,
 				y:prevY
@@ -151,13 +151,13 @@ function setup(){
 		cur.top=evt.clientY+"px";
 	};
 	canvas.onmouseup=function(evt){
-		if(typeof evt !== 'undefined'&&activePath!=null){
+		if(typeof evt!=='undefined'&&activePath!=null){
 			// this is a real mouse handler call and not a delegation from the touch handler
 			evt.stopPropagation();
 			evt.preventDefault();
 			context.moveTo(prevX,prevY);
-			prevX=evt.clientX - canvas.offsetLeft;
-			prevY=evt.clientY - canvas.offsetTop + window.scrollY;
+			prevX=evt.clientX-canvas.offsetLeft;
+			prevY=evt.clientY-canvas.offsetTop+window.scrollY;
 			activePath.points.push({
 				x:prevX,
 				y:prevY
@@ -276,9 +276,7 @@ function saveImg(){
 			// get jpg data
 			data=canvas.toDataURL('image/jpeg');
 		}
-		var img = typeof nativeImage.createFromDataURL === 'function'
-		? nativeImage.createFromDataURL(data)  // electron v0.36+
-		: nativeImage.createFromDataUrl(data); // electron v0.30
+		var img=nativeImage.createFromDataURL(data);
 		if(f.match(/\.png$/i)!==null){
 			// get png data
 			data=img.toPng();
@@ -319,7 +317,7 @@ function redo(){
 }
 
 function repaintAll(){
-	if(typeof canvas == 'undefined'||typeof context == 'undefined'){
+	if(typeof canvas=='undefined'||typeof context=='undefined'){
 		return;
 	}
 	// clear image
@@ -414,7 +412,7 @@ function bgImgClick(){
 		// change image
 		let options={
 			title:'Hintergrundbild öffnen',
-			defaultPath: process.cwd(),
+			defaultPath:process.cwd(),
 			buttonLabel:'Öffnen',
 			filters:[
 				{
@@ -427,10 +425,10 @@ function bgImgClick(){
 		dialog.showOpenDialog(options,(f)=>{
 			if(typeof f!=='undefined'){
 				var bgPath=f[0];
-				fs.stat(bgPath,(err, stat)=>{
+				fs.stat(bgPath,(err,stat)=>{
 					if(err==null){
 						// file exists
-						var img = new Image();
+						var img=new Image();
 						img.onload=function(){
 							var canv=document.createElement('canvas');
 							if(this.naturalWidth>1600){
@@ -444,6 +442,7 @@ function bgImgClick(){
 							}
 							canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
 							bgImg=canv.toDataURL('image/png');
+							// remove background colour and use image instead
 							document.body.style.background="";
 							document.body.style.backgroundImage="url("+bgImg+")";
 						};
@@ -462,7 +461,7 @@ function bgImgClick(){
 }
 
 function fileSave(closing){
-	var closing = (typeof closing !== 'undefined') ? closing : false;
+	var closing=(typeof closing!=='undefined')?closing:false;
 	var data={
 		image:image,
 		bg:document.body.style.background,
@@ -524,7 +523,7 @@ function fileSave(closing){
 function fileOpen(){
 	let options={
 		title:'Tafelbild öffnen',
-		defaultPath: process.cwd(),
+		defaultPath:process.cwd(),
 		buttonLabel:'Öffnen',
 		filters:[
 			{
@@ -554,7 +553,7 @@ function quit(){
 			defaultId:2
 		};
 		dialog.showMessageBox(options,(btnCode)=>{
-			switch (btnCode) {
+			switch(btnCode){
 				case 0:
 					// save and then exit
 					fileSave(true);
@@ -587,7 +586,7 @@ function fileRead(f){
 			defaultId:2
 		};
 		dialog.showMessageBox(options,(btnCode)=>{
-			switch (btnCode) {
+			switch(btnCode){
 				case 0:
 					// save
 					fileSave();
@@ -633,8 +632,8 @@ function _fileRead(f){
 	if(data.width!=canvas.width){
 		// adjust for different screen size
 		var imgScale=canvas.width/data.width;
-		for (var obj in image) {
-			for (var pt in obj.points) {
+		for(var obj in image){
+			for(var pt in obj.points){
 				pt.x*=imgScale;
 				pt.y*=imgScale;
 			}
