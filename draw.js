@@ -4,6 +4,7 @@ const fs=require('fs');
 const path=require('path');
 const {remote,shell,nativeImage}=require('electron');
 const {dialog}=require('electron').remote;
+const pdf=require('pdf-poppler');
 
 var filePath; // file path to use for saving
 
@@ -418,6 +419,10 @@ function bgImgClick(){
 				{
 					name:'Bild',
 					extensions:['png','jpg','jpeg']
+				},
+				{
+					name:'PDF',
+					extensions:['pdf']
 				}
 			],
 			properties:['openFile']
@@ -428,6 +433,19 @@ function bgImgClick(){
 				fs.stat(bgPath,(err,stat)=>{
 					if(err==null){
 						// file exists
+						var isPDF=false;
+						if(path.extname(bgPath)==".pdf"){
+							// convert pdf to image first
+							isPDF=true;
+							let opts={
+								format:'jpeg',
+								out_dir:path.dirname(__dirname),
+								out_prefix:"tmp",
+								page:null
+							};
+							pdf.convert(bgPath,opts);
+							bgImg="tmp.jpeg";
+						}
 						var img=new Image();
 						img.onload=function(){
 							var canv=document.createElement('canvas');
@@ -447,6 +465,9 @@ function bgImgClick(){
 							document.body.style.backgroundImage="url("+bgImg+")";
 						};
 						img.src=bgPath;
+						if(isPDF){
+							// TODO:delete tmp.jpeg file
+						}
 					}
 				});
 			}

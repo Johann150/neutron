@@ -21,9 +21,11 @@
 		"start": "electron .",
 		"dist": "electron-builder"
 	},
-	"dependencies": {},
+	"dependencies": {
+		"pdf-poppler": "^0.2.1"
+	},
 	"devDependencies": {
-		"electron": "^1.7.12",
+		"electron": "^2.0.8",
 		"electron-packager-interactive": "^0.1.3"
 	},
 	"build": {
