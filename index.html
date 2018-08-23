@@ -23,10 +23,11 @@
 			<input type="image" onclick="fileOpen();" src="open.svg" alt="Öffnen"/>
 			<input type="image" onclick="undo();" id="undo" src="back.svg" alt="&#8630;"/>
 			<input type="image" onclick="redo();" id="redo" src="next.svg" alt="&#8631;"/>
-			<input type="range" id="stroke" min="2" max="50" value="1" onchange="strokeChange();"/>
+			<input type="range" id="stroke" min="2" max="50" value="1" oninput="strokeChange();"/>
 			<input type="image" onclick="down();" src="down.svg" alt="&dArr;"/>
 			<input type="image" onclick="quit();" src="exit.svg" alt="Beenden"/>
 		</aside>
 		<canvas id="canvas"></canvas>
+		<div id="erase-cur" style="display:none;"></div>
 	</body>
 </html>

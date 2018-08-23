@@ -16,6 +16,14 @@ body{
 	-webkit-user-select: none;
 	user-select: none;
 }
+#erase-cur{
+	border-radius: 50%;
+	border: 2px dashed black;
+	position:absolute;
+	z-index: 2;
+	transform: translate(-50%,-50%);
+	pointer-events: none;
+}
 aside{
 	background-color: rgba(128, 128, 128, .5);
 	position: fixed;
@@ -65,9 +73,6 @@ canvas{
 .toggle{
 	display: none;
 }
-/*.toggle + label{
-	transition:font-weight 0.5s;
-}*/
 .toggle:checked + label{
 background-color: #929292;
 }
