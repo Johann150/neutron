@@ -2,6 +2,7 @@
 
 const fs=require('fs');
 const path=require('path');
+const url=require('url');
 const {remote,shell,nativeImage}=require('electron');
 const {dialog}=require('electron').remote;
 const pdf=require('pdf-poppler');
@@ -328,7 +329,6 @@ function repaintAll(){
 		context.beginPath();
 		var path=image[i];
 		if(path==null){
-			console.log(image);
 			continue;
 		}
 		// set appearance
@@ -417,12 +417,8 @@ function bgImgClick(){
 			buttonLabel:'Öffnen',
 			filters:[
 				{
-					name:'Bild',
-					extensions:['png','jpg','jpeg']
-				},
-				{
-					name:'PDF',
-					extensions:['pdf']
+					name:'Alle',
+					extensions:['png','jpg','jpeg','pdf']
 				}
 			],
 			properties:['openFile']
@@ -439,7 +435,7 @@ function bgImgClick(){
 							isPDF=true;
 							let opts={
 								format:'jpeg',
-								out_dir:path.dirname(__dirname),
+								out_dir:__dirname+path.sep,
 								out_prefix:"tmp",
 								page:null
 							};
