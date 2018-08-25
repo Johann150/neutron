@@ -429,40 +429,69 @@ function bgImgClick(){
 				fs.stat(bgPath,(err,stat)=>{
 					if(err==null){
 						// file exists
-						var isPDF=false;
 						if(path.extname(bgPath)==".pdf"){
-							// convert pdf to image first
-							isPDF=true;
+							// convert pdf to image
 							let opts={
 								format:'jpeg',
 								out_dir:__dirname+path.sep,
 								out_prefix:"tmp",
 								page:null
 							};
-							pdf.convert(bgPath,opts);
-							bgImg="tmp.jpeg";
-						}
-						var img=new Image();
-						img.onload=function(){
-							var canv=document.createElement('canvas');
-							if(this.naturalWidth>1600){
-								// if too big resize image so the data url does not get too large
-								canv.width=1600;
-								// resize appropriately
-								canv.height=this.naturalHeight*1600/this.naturalWidth;
-							}else{
-								canv.width=this.naturalWidth;
-								canv.height=this.naturalHeight;
-							}
-							canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
-							bgImg=canv.toDataURL('image/png');
-							// remove background colour and use image instead
-							document.body.style.background="";
-							document.body.style.backgroundImage="url("+bgImg+")";
-						};
-						img.src=bgPath;
-						if(isPDF){
-							// TODO:delete tmp.jpeg file
+							bgPath=bgPath.replace(/\\/g,"/");
+							console.log(bgPath);
+							pdf.convert(bgPath,opts).then(()=>{
+								var images=[];
+								var height=0;
+								// gather all generated images into array; also compute total height
+								for(var i=0;fs.existsSync(path.join(__dirname,"tmp-"+i+".jpeg"));i++)){
+									Image img=new Image();
+									img.src=url.format({
+										pathname:path.join(__dirname,"tmp-"+i+".jpeg"),
+										protocol:'file:',
+										slashes:true
+									});
+									images.push(img);
+									var size=calculateAspectRatioFit(img.width,img.height,canvas.width,img.height);
+									height+=size.height;
+								}
+								// draw all images to a single canvas
+								var canv=document.createElement('canvas');
+								canv.height=height;
+								canv.width=canvas.width;
+								var contxt=canv.getContext('2d');
+								var xOff=0;
+								for(var i=0;i<images.length;i++){
+									var size=calculateAspectRatioFit(img.width,img.height,canvas.width,img.height);
+									contxt.drawImage(img,xOff,0,size.width,size.height);
+									xOff+=size.height;
+								}
+								// extract data url
+								bgImg=canv.toDataURL('image/png');
+								document.body.style.background="";
+								document.body.style.backgroundImage="url("+bgImg+")";
+							});
+							// TODO:delete tmp files
+						}else{
+							bgPath=path;
+							var img=new Image();
+							img.onload=function(){
+								var canv=document.createElement('canvas');
+								if(this.naturalWidth>1600){
+									// if too big resize image so the data url does not get too large
+									canv.width=1600;
+									// resize appropriately
+									canv.height=this.naturalHeight*1600/this.naturalWidth;
+								}else{
+									canv.width=this.naturalWidth;
+									canv.height=this.naturalHeight;
+								}
+								canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
+								bgImg=canv.toDataURL('image/png');
+								// remove background colour and use image instead
+								document.body.style.background="";
+								document.body.style.backgroundImage="url("+bgImg+")";
+							};
+							img.src=bgPath;
 						}
 					}
 				});
