@@ -431,46 +431,66 @@ function bgImgClick(){
 						// file exists
 						if(path.extname(bgPath)==".pdf"){
 							// convert pdf to image
-							let opts={
-								format:'jpeg',
-								out_dir:__dirname+path.sep,
-								out_prefix:"tmp",
-								page:null
-							};
-							bgPath=bgPath.replace(/\\/g,"/");
-							console.log(bgPath);
-							pdf.convert(bgPath,opts).then(()=>{
-								var images=[];
-								var height=0;
-								// gather all generated images into array; also compute total height
-								for(var i=0;fs.existsSync(path.join(__dirname,"tmp-"+i+".jpeg"));i++)){
-									Image img=new Image();
-									img.src=url.format({
-										pathname:path.join(__dirname,"tmp-"+i+".jpeg"),
-										protocol:'file:',
-										slashes:true
+							pdf.info(bgPath).then((size)=>{
+								// calculate correct size for image extraction
+								size=calculateAspectRatioFit(size.width_in_pts,size.height_in_pts,canvas.width,Number.MAX_SAFE_INTEGER);
+								let opts={
+									format:'jpeg',
+									out_dir:__dirname+path.sep,
+									out_prefix:"tmp",
+									page:null,
+									// extract the image in the largest size so it does not have to be scaled up
+									scale:Math.max(size.width,size.height)
+								};
+								// correct Windows paths: replace all backslashes with forward slashes
+								bgPath=bgPath.replace(/\\/g,"/");
+								// extract images
+								pdf.convert(bgPath,opts).then(()=>{
+									var images=[];
+									var promises=[];
+									// gather all generated images into array
+									for(var i=1;fs.existsSync(path.join(__dirname,"tmp-"+i+".jpg"));i++){
+										var img=new Image();
+										images.push(img);
+										promises.push(new Promise((resolve,error)=>{
+											img.onload=resolve;
+										}));
+										img.src=url.format({
+											pathname:path.join(__dirname,"tmp-"+i+".jpg"),
+											protocol:'file:',
+											slashes:true
+										});
+									}
+									// wait for all images to be loaded
+									Promise.all(promises).then(()=>{
+										// all images have been loaded
+										var height=0;
+										for(var i=0;i<images.length;i++){
+											var size=calculateAspectRatioFit(images[i].width,images[i].height,canvas.width,Number.MAX_SAFE_INTEGER);
+											height+=size.height;
+										}
+										// draw all images to a single canvas
+										var canv=document.createElement('canvas');
+										canv.height=height;
+										canv.width=canvas.width;
+										var contxt=canv.getContext('2d');
+										var yOff=0;
+										for(var i=0;i<images.length;i++){
+											var size=calculateAspectRatioFit(images[i].width,images[i].height,canvas.width,Number.MAX_SAFE_INTEGER);
+											contxt.drawImage(images[i],0,yOff,size.width,size.height);
+											yOff+=size.height;
+										}
+										// extract data url
+										bgImg=canv.toDataURL('image/png');
+										document.body.style.background="";
+										document.body.style.backgroundImage="url("+bgImg+")";
+										// remove temporary single page images
+										for(var i=1;fs.existsSync(path.join(__dirname,"tmp-"+i+".jpg"));i++){
+											fs.unlink(path.join(__dirname,"tmp-"+i+".jpg"),()=>{/*ok*/});
+										}
 									});
-									images.push(img);
-									var size=calculateAspectRatioFit(img.width,img.height,canvas.width,img.height);
-									height+=size.height;
-								}
-								// draw all images to a single canvas
-								var canv=document.createElement('canvas');
-								canv.height=height;
-								canv.width=canvas.width;
-								var contxt=canv.getContext('2d');
-								var xOff=0;
-								for(var i=0;i<images.length;i++){
-									var size=calculateAspectRatioFit(img.width,img.height,canvas.width,img.height);
-									contxt.drawImage(img,xOff,0,size.width,size.height);
-									xOff+=size.height;
-								}
-								// extract data url
-								bgImg=canv.toDataURL('image/png');
-								document.body.style.background="";
-								document.body.style.backgroundImage="url("+bgImg+")";
+								});
 							});
-							// TODO:delete tmp files
 						}else{
 							bgPath=path;
 							var img=new Image();
