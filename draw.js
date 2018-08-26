@@ -430,6 +430,8 @@ function bgImgClick(){
 					if(err==null){
 						// file exists
 						if(path.extname(bgPath)==".pdf"){
+							// enable loader
+							document.body.classList.add('loading');
 							// convert pdf to image
 							pdf.info(bgPath).then((size)=>{
 								// calculate correct size for image extraction
@@ -484,7 +486,9 @@ function bgImgClick(){
 										bgImg=canv.toDataURL('image/png');
 										document.body.style.background="";
 										document.body.style.backgroundImage="url("+bgImg+")";
-										// remove temporary single page images
+										// done; remove loader
+										document.body.classList.remove('loading');
+										// cleanup: remove temporary single page images
 										for(var i=1;fs.existsSync(path.join(__dirname,"tmp-"+i+".jpg"));i++){
 											fs.unlink(path.join(__dirname,"tmp-"+i+".jpg"),()=>{/*ok*/});
 										}
