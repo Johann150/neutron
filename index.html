@@ -2,32 +2,33 @@
 <html>
 	<head>
 		<meta charset="utf-8">
+		<meta http-equiv="Content-Security-Policy" content="script-src 'self'">
 		<title>Neutron</title>
-		<script src="lib.js"></script>
-		<script src="draw.js"></script>
 		<link rel="icon" type="image/svg+xml" href="atoms.svg"/>
 		<link rel="stylesheet" type="text/css" href="index.css"/>
 	</head>
-	<body onload="setup();">
+	<body>
 		<aside id="toolbox">
 			<input type="radio" class="toggle" id="pen" name="drawing" checked data-old="true"/>
-			<label for="pen" onclick="penClick();"><img src="stift.svg" alt="&#10000;"/></label>
+			<label for="pen"><img src="stift.svg" alt="&#10000;"/></label>
 			<input type="radio" class="toggle" id="erase" name="drawing"/>
-			<label for="erase" onclick="eraseClick();"><img src="schwamm.svg" alt="Schwamm"></label>
+			<label for="erase"><img src="schwamm.svg" alt="Schwamm"></label>
 			<input type="radio" class="toggle" id="bg-color" name="bg" checked data-old="true"/>
-			<label for="bg-color" onclick="bgColorClick();"><img src="bg.svg" alt="Hintergr.-Farbe"/></label>
+			<label for="bg-color"><img src="bg.svg" alt="Hintergr.-Farbe"/></label>
 			<input type="radio" class="toggle" id="bg-img" name="bg"/>
-			<label for="bg-img" onclick="bgImgClick();"><img src="background.svg" alt="Hintergr.-Bild"/></label>
+			<label for="bg-img"><img src="background.svg" alt="Hintergr.-Bild"/></label>
 			<a id="save-img" href="#"><img src="save.svg" alt="Bild speichern"></a>
-			<input type="image" onclick="fileSave();" src="save2.svg" alt="Speichern"/>
-			<input type="image" onclick="fileOpen();" src="open.svg" alt="Öffnen"/>
-			<input type="image" onclick="undo();" id="undo" src="back.svg" alt="&#8630;"/>
-			<input type="image" onclick="redo();" id="redo" src="next.svg" alt="&#8631;"/>
-			<input type="range" id="stroke" min="2" max="50" value="1" oninput="strokeChange();"/>
-			<input type="image" onclick="down();" src="down.svg" alt="&dArr;"/>
-			<input type="image" onclick="quit();" src="exit.svg" alt="Beenden"/>
+			<input type="image" id="save" src="save2.svg" alt="Speichern"/>
+			<input type="image" id="open" src="open.svg" alt="Öffnen"/>
+			<input type="image" id="undo" src="back.svg" alt="&#8630;"/>
+			<input type="image" id="redo" src="next.svg" alt="&#8631;"/>
+			<input type="range" id="stroke" min="2" max="50" value="1"/>
+			<input type="image" id="down" src="down.svg" alt="&dArr;"/>
+			<input type="image" id="quit" src="exit.svg" alt="Beenden"/>
 		</aside>
 		<canvas id="canvas"></canvas>
 		<div id="erase-cur" style="display:none;"></div>
+		<script src="lib.js"></script>
+		<script src="draw.js"></script>
 	</body>
 </html>

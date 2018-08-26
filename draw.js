@@ -57,7 +57,22 @@ function checkTemplateFile(){
 	});
 }
 
+function setupHandlers(){
+	document.querySelector('label[for=pen]').onclick=penClick;
+	document.querySelector('label[for=erase]').onclick=eraseClick;
+	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
+	document.querySelector('label[for=bg-img]').onclick=bgImgClick;
+	document.getElementById('save').onclick=fileSave;
+	document.getElementById('open').onclick=fileOpen;
+	document.getElementById('undo').onclick=undo;
+	document.getElementById('redo').onclick=redo;
+	document.getElementById('stroke').oninput=strokeChange;
+	document.getElementById('down').onclick=down;
+	document.getElementById('quit').onclick=quit;
+}
+
 function setup(){
+	setupHandlers();
 	// grey-out undo and redo buttons
 	document.getElementById('undo').style.filter="brightness(50%)";
 	document.getElementById('redo').style.filter="brightness(50%)";
@@ -604,7 +619,7 @@ function fileOpen(){
 		properties:['openFile']
 	};
 	dialog.showOpenDialog(options,(f)=>{
-		if(f.length!=='undefined'){
+		if(typeof f!=='undefined'){
 			filePath=f[0];
 			fileRead(filePath);
 		}
@@ -733,3 +748,6 @@ function _fileRead(f){
 	eraseWidth=data.eraseWidth;
 	saved=true;
 }
+
+// start neutron
+setup();
