@@ -62,6 +62,7 @@ function setupHandlers(){
 	document.querySelector('label[for=erase]').onclick=eraseClick;
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
 	document.querySelector('label[for=bg-img]').onclick=bgImgClick;
+	document.getElementById("save-img").onclick=saveImg;
 	document.getElementById('save').onclick=fileSave;
 	document.getElementById('open').onclick=fileOpen;
 	document.getElementById('undo').onclick=undo;
@@ -224,8 +225,6 @@ function setup(){
 		canvas.onmouseup();
 	};
 	canvas.ontouchcancel=document.onmouseup;
-	// save handler
-	document.getElementById("save-img").onclick=saveImg;
 	// key handlers
 	document.onkeyup=function(evt){
 		if(evt.keyCode==27){
@@ -447,13 +446,18 @@ function bgImgClick(){
 						if(path.extname(bgPath)==".pdf"){
 							// enable loader
 							document.body.classList.add('loading');
+							// copy pdf to local directory so pdf-poppler can handle it correctly
+							fs.copyFileSync(bgPath,path.join(process.cwd(),'tmp.pdf'));
+							bgPath=path.join(process.cwd(),'tmp.pdf');
 							// convert pdf to image
 							pdf.info(bgPath).then((size)=>{
+								// get number of digits in page numbers
+								var pageDigits=size.pages.length;
 								// calculate correct size for image extraction
 								size=calculateAspectRatioFit(size.width_in_pts,size.height_in_pts,canvas.width,Number.MAX_SAFE_INTEGER);
 								let opts={
 									format:'jpeg',
-									out_dir:__dirname+path.sep,
+									out_dir:process.cwd()+path.sep,
 									out_prefix:"tmp",
 									page:null,
 									// extract the image in the largest size so it does not have to be scaled up
@@ -466,17 +470,17 @@ function bgImgClick(){
 									var images=[];
 									var promises=[];
 									// gather all generated images into array
-									for(var i=1;fs.existsSync(path.join(__dirname,"tmp-"+i+".jpg"));i++){
+									for(var i=1;fs.existsSync(formattedPagePath(pageDigits,i));i++){
 										var img=new Image();
 										images.push(img);
 										promises.push(new Promise((resolve,error)=>{
 											img.onload=resolve;
 										}));
 										img.src=url.format({
-											pathname:path.join(__dirname,"tmp-"+i+".jpg"),
+											pathname:formattedPagePath(pageDigits,i),
 											protocol:'file:',
 											slashes:true
-										});
+										}).replace(/\\/g,'/');
 									}
 									// wait for all images to be loaded
 									Promise.all(promises).then(()=>{
@@ -504,9 +508,11 @@ function bgImgClick(){
 										// done; remove loader
 										document.body.classList.remove('loading');
 										// cleanup: remove temporary single page images
-										for(var i=1;fs.existsSync(path.join(__dirname,"tmp-"+i+".jpg"));i++){
-											fs.unlink(path.join(__dirname,"tmp-"+i+".jpg"),()=>{/*ok*/});
+										for(var i=1;fs.existsSync(formattedPagePath(pageDigits,i));i++){
+											fs.unlink(formattedPagePath(pageDigits,i),()=>{/*ok*/});
 										}
+										// remove temporary pdf
+										fs.unlink(path.join(process.cwd(),'tmp.pdf'),()=>{/*ok*/});
 									});
 								});
 							});

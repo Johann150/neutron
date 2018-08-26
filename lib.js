@@ -15,6 +15,12 @@ function calculateAspectRatioFit(srcWidth,srcHeight,maxWidth,maxHeight){
 	return {width:srcWidth*ratio,height:srcHeight*ratio};
 }
 
+function formattedPagePath(numDigits,page){
+	page=page.toString();
+	page=page.padStart(numDigits,'0');
+	return path.join(process.cwd(),"tmp-"+page+".jpg");
+}
+
 Image.prototype.load = function(url){
 	var thisImg = this;
 	var xmlHTTP = new XMLHttpRequest();
