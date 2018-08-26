@@ -10,6 +10,11 @@ function rgb2hex(rgb){
 		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : rgb;
 }
 
+function calculateAspectRatioFit(srcWidth,srcHeight,maxWidth,maxHeight){
+	var ratio=Math.min(maxWidth/srcWidth,maxHeight/srcHeight);
+	return {width:srcWidth*ratio,height:srcHeight*ratio};
+}
+
 Image.prototype.load = function(url){
 	var thisImg = this;
 	var xmlHTTP = new XMLHttpRequest();

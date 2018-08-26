@@ -2,8 +2,10 @@
 
 const fs=require('fs');
 const path=require('path');
+const url=require('url');
 const {remote,shell,nativeImage}=require('electron');
 const {dialog}=require('electron').remote;
+const pdf=require('pdf-poppler');
 
 var filePath; // file path to use for saving
 
@@ -327,7 +329,6 @@ function repaintAll(){
 		context.beginPath();
 		var path=image[i];
 		if(path==null){
-			console.log(image);
 			continue;
 		}
 		// set appearance
@@ -416,8 +417,8 @@ function bgImgClick(){
 			buttonLabel:'Öffnen',
 			filters:[
 				{
-					name:'Bild',
-					extensions:['png','jpg','jpeg']
+					name:'Alle',
+					extensions:['png','jpg','jpeg','pdf']
 				}
 			],
 			properties:['openFile']
@@ -428,25 +429,94 @@ function bgImgClick(){
 				fs.stat(bgPath,(err,stat)=>{
 					if(err==null){
 						// file exists
-						var img=new Image();
-						img.onload=function(){
-							var canv=document.createElement('canvas');
-							if(this.naturalWidth>1600){
-								// if too big resize image so the data url does not get too large
-								canv.width=1600;
-								// resize appropriately
-								canv.height=this.naturalHeight*1600/this.naturalWidth;
-							}else{
-								canv.width=this.naturalWidth;
-								canv.height=this.naturalHeight;
-							}
-							canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
-							bgImg=canv.toDataURL('image/png');
-							// remove background colour and use image instead
-							document.body.style.background="";
-							document.body.style.backgroundImage="url("+bgImg+")";
-						};
-						img.src=bgPath;
+						if(path.extname(bgPath)==".pdf"){
+							// enable loader
+							document.body.classList.add('loading');
+							// convert pdf to image
+							pdf.info(bgPath).then((size)=>{
+								// calculate correct size for image extraction
+								size=calculateAspectRatioFit(size.width_in_pts,size.height_in_pts,canvas.width,Number.MAX_SAFE_INTEGER);
+								let opts={
+									format:'jpeg',
+									out_dir:__dirname+path.sep,
+									out_prefix:"tmp",
+									page:null,
+									// extract the image in the largest size so it does not have to be scaled up
+									scale:Math.max(size.width,size.height)
+								};
+								// correct Windows paths: replace all backslashes with forward slashes
+								bgPath=bgPath.replace(/\\/g,"/");
+								// extract images
+								pdf.convert(bgPath,opts).then(()=>{
+									var images=[];
+									var promises=[];
+									// gather all generated images into array
+									for(var i=1;fs.existsSync(path.join(__dirname,"tmp-"+i+".jpg"));i++){
+										var img=new Image();
+										images.push(img);
+										promises.push(new Promise((resolve,error)=>{
+											img.onload=resolve;
+										}));
+										img.src=url.format({
+											pathname:path.join(__dirname,"tmp-"+i+".jpg"),
+											protocol:'file:',
+											slashes:true
+										});
+									}
+									// wait for all images to be loaded
+									Promise.all(promises).then(()=>{
+										// all images have been loaded
+										var height=0;
+										for(var i=0;i<images.length;i++){
+											var size=calculateAspectRatioFit(images[i].width,images[i].height,canvas.width,Number.MAX_SAFE_INTEGER);
+											height+=size.height;
+										}
+										// draw all images to a single canvas
+										var canv=document.createElement('canvas');
+										canv.height=height;
+										canv.width=canvas.width;
+										var contxt=canv.getContext('2d');
+										var yOff=0;
+										for(var i=0;i<images.length;i++){
+											var size=calculateAspectRatioFit(images[i].width,images[i].height,canvas.width,Number.MAX_SAFE_INTEGER);
+											contxt.drawImage(images[i],0,yOff,size.width,size.height);
+											yOff+=size.height;
+										}
+										// extract data url
+										bgImg=canv.toDataURL('image/png');
+										document.body.style.background="";
+										document.body.style.backgroundImage="url("+bgImg+")";
+										// done; remove loader
+										document.body.classList.remove('loading');
+										// cleanup: remove temporary single page images
+										for(var i=1;fs.existsSync(path.join(__dirname,"tmp-"+i+".jpg"));i++){
+											fs.unlink(path.join(__dirname,"tmp-"+i+".jpg"),()=>{/*ok*/});
+										}
+									});
+								});
+							});
+						}else{
+							bgPath=path;
+							var img=new Image();
+							img.onload=function(){
+								var canv=document.createElement('canvas');
+								if(this.naturalWidth>1600){
+									// if too big resize image so the data url does not get too large
+									canv.width=1600;
+									// resize appropriately
+									canv.height=this.naturalHeight*1600/this.naturalWidth;
+								}else{
+									canv.width=this.naturalWidth;
+									canv.height=this.naturalHeight;
+								}
+								canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
+								bgImg=canv.toDataURL('image/png');
+								// remove background colour and use image instead
+								document.body.style.background="";
+								document.body.style.backgroundImage="url("+bgImg+")";
+							};
+							img.src=bgPath;
+						}
 					}
 				});
 			}
