@@ -295,10 +295,10 @@ function saveImg(){
 		var img=nativeImage.createFromDataURL(data);
 		if(f.match(/\.png$/i)!==null){
 			// get png data
-			data=img.toPng();
+			data=img.toPNG();
 		}else if(f.match(/\.jpe?g$/i)!==null){
 			// get jpg data
-			data=img.toJpeg(1);
+			data=img.toJPEG(1);
 		}
 		fs.writeFile(f,data,(err)=>{
 			if(err){
