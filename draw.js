@@ -517,7 +517,6 @@ function bgImgClick(){
 								});
 							});
 						}else{
-							bgPath=path;
 							var img=new Image();
 							img.onload=function(){
 								var canv=document.createElement('canvas');
