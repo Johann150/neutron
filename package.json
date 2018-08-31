@@ -10,10 +10,10 @@
 	"license": "AGPL-3.0",
 	"repository": {
 		"type": "git",
-		"url": "http://github.com/Johann150/neutron-electron"
+		"url": "http://github.com/Johann150/neutron"
 	},
 	"bugs": {
-		"url": "https://github.com/Johann150/neutron-electron/issues",
+		"url": "https://github.com/Johann150/neutron/issues",
 		"email": "johann.galle@protonmail.com"
 	},
 	"main": "main.js",
