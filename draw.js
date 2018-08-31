@@ -468,12 +468,12 @@ function bgImgClick(){
 								// extract images
 								pdf.convert(bgPath,opts).then(()=>{
 									var images=[];
-									var promises=[];
+									var promises_or_sizes=[];
 									// gather all generated images into array
 									for(var i=1;fs.existsSync(formattedPagePath(pageDigits,i));i++){
 										var img=new Image();
 										images.push(img);
-										promises.push(new Promise((resolve,error)=>{
+										promises_or_sizes.push(new Promise((resolve,error)=>{
 											img.onload=resolve;
 										}));
 										img.src=url.format({
@@ -483,23 +483,23 @@ function bgImgClick(){
 										}).replace(/\\/g,'/');
 									}
 									// wait for all images to be loaded
-									Promise.all(promises).then(()=>{
+									Promise.all(promises_or_sizes).then(()=>{
 										// all images have been loaded
 										var height=0;
 										for(var i=0;i<images.length;i++){
-											var size=calculateAspectRatioFit(images[i].width,images[i].height,canvas.width,Number.MAX_SAFE_INTEGER);
-											height+=size.height;
+											promises_or_sizes[i]=calculateAspectRatioFit(images[i].width,images[i].height,canvas.width,Number.MAX_SAFE_INTEGER);
+											height+=promises_or_sizes[i].height;
 										}
 										// draw all images to a single canvas
 										var canv=document.createElement('canvas');
 										canv.height=height;
 										canv.width=canvas.width;
 										var contxt=canv.getContext('2d');
-										var yOff=0;
+										height=0;
 										for(var i=0;i<images.length;i++){
-											var size=calculateAspectRatioFit(images[i].width,images[i].height,canvas.width,Number.MAX_SAFE_INTEGER);
-											contxt.drawImage(images[i],0,yOff,size.width,size.height);
-											yOff+=size.height;
+											var size=promises_or_sizes[i];
+											contxt.drawImage(images[i],0,height,size.width,size.height);
+											height+=size.height;
 										}
 										// extract data url
 										bgImg=canv.toDataURL('image/png');
