@@ -100,6 +100,7 @@ function setup(){
 	activePath=null;
 	redoStack=[]
 	penColor="#ffffff";
+	document.body.style.setProperty("--pen-color",penColor);
 	bgColor="#006633";
 	bgImg=null;
 	document.body.style.background=bgColor;
@@ -164,7 +165,7 @@ function setup(){
 			context.stroke();
 		}
 		// set erasor cursor
-		var style=document.querySelector('html').style;
+		var style=document.body.style;
 		style.setProperty("--erase-x",evt.clientX+"px");
 		style.setProperty("--erase-y",evt.clientY+"px");
 	};
@@ -369,6 +370,7 @@ function penClick(){
 		colorchooser.value=context.strokeStyle;
 		colorchooser.onchange=function(evt){
 			penColor=colorchooser.value;
+			document.body.style.setProperty("--pen-color",penColor);
 			saved=false;
 		};
 		colorchooser.click();
@@ -386,7 +388,7 @@ function eraseClick(){
 	pen.setAttribute('data-old','false');
 	document.getElementById('stroke').value=eraseWidth;
 	document.getElementById('erase-cur').style.display="block";
-	document.querySelector('html').style.setProperty("--erase-size",eraseWidth+"px");
+	document.body.style.setProperty("--erase-size",eraseWidth+"px");
 	document.getElementById('canvas').style.cursor="none";
 }
 
@@ -394,7 +396,7 @@ function strokeChange(){
 	var stroke=document.getElementById('stroke').value;
 	if(document.getElementById('erase').checked){
 		eraseWidth=stroke;
-		document.querySelector('html').style.setProperty("--erase-size",eraseWidth+"px");
+		document.body.style.setProperty("--erase-size",eraseWidth+"px");
 	}else{
 		penWidth=stroke;
 	}
@@ -748,6 +750,7 @@ function _fileRead(f){
 	document.getElementById('stroke').value=penWidth;
 	penColor=data.penColor;
 	context.strokeStyle=penColor;
+	document.body.style.setProperty("--pen-color",penColor);
 	eraseWidth=data.eraseWidth;
 	saved=true;
 }

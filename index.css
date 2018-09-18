@@ -118,5 +118,8 @@ canvas{
 	display:none;
 }
 .toggle:checked + label{
-background-color:#929292;
+	background-color:#929292;
+}
+#pen:checked + label{
+	background-color:var(--pen-color);
 }
