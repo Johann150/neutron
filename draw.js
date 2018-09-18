@@ -432,7 +432,7 @@ function bgImgClick(){
 			filters:[
 				{
 					name:'Alle',
-					extensions:['png','jpg','jpeg','pdf']
+					extensions:['png','jpg','jpeg'/*,'pdf'*/]
 				}
 			],
 			properties:['openFile']
