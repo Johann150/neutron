@@ -50,13 +50,23 @@ body.loading::after{
 	height:4em;
 	animation:rotate 1s infinite linear;
 }
-#erase-cur{
-	border-radius: 50%;
-	border: 2px dashed black;
+#erase-cur::before,
+#erase-cur::after{
+	content:'';
+	border-radius:50%;
+	border:2px dashed black;
 	position:absolute;
-	z-index: 2;
-	transform: translate(-50%,-50%);
-	pointer-events: none;
+	z-index:3;
+	transform:translate(-50%,-50%);
+	pointer-events:none;
+	width:var(--erase-size);
+	height:var(--erase-size);
+	left:var(--erase-x);
+	top:var(--erase-y);
+}
+#erase-cur::after{
+	z-index:2;
+	border:2px solid white;
 }
 aside{
 	background-color: rgba(128, 128, 128, .5);

@@ -164,9 +164,9 @@ function setup(){
 			context.stroke();
 		}
 		// set erasor cursor
-		var cur=document.getElementById('erase-cur').style;
-		cur.left=evt.clientX+"px";
-		cur.top=evt.clientY+"px";
+		var style=document.querySelector('html').style;
+		style.setProperty("--erase-x",evt.clientX+"px");
+		style.setProperty("--erase-y",evt.clientY+"px");
 	};
 	canvas.onmouseup=function(evt){
 		if(typeof evt!=='undefined'&&activePath!=null){
@@ -385,9 +385,8 @@ function eraseClick(){
 	var pen=document.getElementById('pen');
 	pen.setAttribute('data-old','false');
 	document.getElementById('stroke').value=eraseWidth;
-	var cur=document.getElementById('erase-cur').style;
-	cur.display="block";
-	cur.width=cur.height=eraseWidth+"px";
+	document.getElementById('erase-cur').style.display="block";
+	document.querySelector('html').style.setProperty("--erase-size",eraseWidth+"px");
 	document.getElementById('canvas').style.cursor="none";
 }
 
@@ -395,8 +394,7 @@ function strokeChange(){
 	var stroke=document.getElementById('stroke').value;
 	if(document.getElementById('erase').checked){
 		eraseWidth=stroke;
-		var cur=document.getElementById('erase-cur').style;
-		cur.width=cur.height=eraseWidth+"px";
+		document.querySelector('html').style.setProperty("--erase-size",eraseWidth+"px");
 	}else{
 		penWidth=stroke;
 	}
