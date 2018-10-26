@@ -55,7 +55,7 @@ body.loading::after{
 	content:'';
 	border-radius:50%;
 	border:2px dashed black;
-	position:absolute;
+	position:fixed;
 	z-index:3;
 	transform:translate(-50%,-50%);
 	pointer-events:none;

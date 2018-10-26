@@ -5,7 +5,6 @@ const path=require('path');
 const url=require('url');
 const {remote,shell,nativeImage}=require('electron');
 const {dialog}=require('electron').remote;
-const pdf=require('pdf-poppler');
 
 var filePath; // file path to use for saving
 
@@ -432,7 +431,7 @@ function bgImgClick(){
 			filters:[
 				{
 					name:'Alle',
-					extensions:['png','jpg','jpeg'/*,'pdf'*/]
+					extensions:['png','jpg','jpeg']
 				}
 			],
 			properties:['openFile']
@@ -443,100 +442,25 @@ function bgImgClick(){
 				fs.stat(bgPath,(err,stat)=>{
 					if(err==null){
 						// file exists
-						if(path.extname(bgPath)==".pdf"){
-							// enable loader
-							document.body.classList.add('loading');
-							// copy pdf to local directory so pdf-poppler can handle it correctly
-							fs.copyFileSync(bgPath,path.join(process.cwd(),'tmp.pdf'));
-							bgPath=path.join(process.cwd(),'tmp.pdf');
-							// convert pdf to image
-							pdf.info(bgPath).then((size)=>{
-								// get number of digits in page numbers
-								var pageDigits=size.pages.length;
-								// calculate correct size for image extraction
-								size=calculateAspectRatioFit(size.width_in_pts,size.height_in_pts,canvas.width,Number.MAX_SAFE_INTEGER);
-								let opts={
-									format:'jpeg',
-									out_dir:process.cwd()+path.sep,
-									out_prefix:"tmp",
-									page:null,
-									// extract the image in the largest size so it does not have to be scaled up
-									scale:Math.max(size.width,size.height)
-								};
-								// correct Windows paths: replace all backslashes with forward slashes
-								bgPath=bgPath.replace(/\\/g,"/");
-								// extract images
-								pdf.convert(bgPath,opts).then(()=>{
-									var images=[];
-									var promises_or_sizes=[];
-									// gather all generated images into array
-									for(var i=1;fs.existsSync(formattedPagePath(pageDigits,i));i++){
-										var img=new Image();
-										images.push(img);
-										promises_or_sizes.push(new Promise((resolve,error)=>{
-											img.onload=resolve;
-										}));
-										img.src=url.format({
-											pathname:formattedPagePath(pageDigits,i),
-											protocol:'file:',
-											slashes:true
-										}).replace(/\\/g,'/');
-									}
-									// wait for all images to be loaded
-									Promise.all(promises_or_sizes).then(()=>{
-										// all images have been loaded
-										var height=0;
-										for(var i=0;i<images.length;i++){
-											promises_or_sizes[i]=calculateAspectRatioFit(images[i].width,images[i].height,canvas.width,Number.MAX_SAFE_INTEGER);
-											height+=promises_or_sizes[i].height;
-										}
-										// draw all images to a single canvas
-										var canv=document.createElement('canvas');
-										canv.height=height;
-										canv.width=canvas.width;
-										var contxt=canv.getContext('2d');
-										height=0;
-										for(var i=0;i<images.length;i++){
-											var size=promises_or_sizes[i];
-											contxt.drawImage(images[i],0,height,size.width,size.height);
-											height+=size.height;
-										}
-										// extract data url
-										bgImg=canv.toDataURL('image/png');
-										document.body.style.background="";
-										document.body.style.backgroundImage="url("+bgImg+")";
-										// done; remove loader
-										document.body.classList.remove('loading');
-										// cleanup: remove temporary single page images
-										for(var i=1;fs.existsSync(formattedPagePath(pageDigits,i));i++){
-											fs.unlink(formattedPagePath(pageDigits,i),()=>{/*ok*/});
-										}
-										// remove temporary pdf
-										fs.unlink(path.join(process.cwd(),'tmp.pdf'),()=>{/*ok*/});
-									});
-								});
-							});
-						}else{
-							var img=new Image();
-							img.onload=function(){
-								var canv=document.createElement('canvas');
-								if(this.naturalWidth>1600){
-									// if too big resize image so the data url does not get too large
-									canv.width=1600;
-									// resize appropriately
-									canv.height=this.naturalHeight*1600/this.naturalWidth;
-								}else{
-									canv.width=this.naturalWidth;
-									canv.height=this.naturalHeight;
-								}
-								canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
-								bgImg=canv.toDataURL('image/png');
-								// remove background colour and use image instead
-								document.body.style.background="";
-								document.body.style.backgroundImage="url("+bgImg+")";
-							};
-							img.src=bgPath;
-						}
+						var img=new Image();
+						img.onload=function(){
+							var canv=document.createElement('canvas');
+							if(this.naturalWidth>1600){
+								// if too big resize image so the data url does not get too large
+								canv.width=1600;
+								// resize appropriately
+								canv.height=this.naturalHeight*1600/this.naturalWidth;
+							}else{
+								canv.width=this.naturalWidth;
+								canv.height=this.naturalHeight;
+							}
+							canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
+							bgImg=canv.toDataURL('image/png');
+							// remove background colour and use image instead
+							document.body.style.background="";
+							document.body.style.backgroundImage="url("+bgImg+")";
+						};
+						img.src=bgPath;
 					}
 				});
 			}
