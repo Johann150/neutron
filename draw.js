@@ -3,7 +3,7 @@
 const fs=require('fs');
 const path=require('path');
 const url=require('url');
-const {remote,shell,nativeImage}=require('electron');
+const {remote}=require('electron');
 const {dialog}=require('electron').remote;
 
 var filePath; // file path to use for saving
@@ -49,7 +49,6 @@ function setupHandlers(){
 	document.querySelector('label[for=erase]').onclick=eraseClick;
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
 	document.querySelector('label[for=bg-img]').onclick=bgImgClick;
-	document.getElementById("save-img").onclick=saveImg;
 	document.getElementById('save').onclick=fileSave;
 	document.getElementById('open').onclick=fileOpen;
 	document.getElementById('undo').onclick=undo;
@@ -191,57 +190,6 @@ function down(){
 	window.scrollTo(0,getScrollMaxY());
 }
 
-function saveImg(){
-	var date=new Date();
-	let options={
-		title:'Als Bild speichern',
-		buttonLabel:'Speichern',
-		defaultPath:date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate(),
-		filters:[
-			{
-				name:'PNG-Bild',
-				extensions:['png']
-			},
-			{
-				name:'JPEG-Bild',
-				extensions:['jpg','jpeg']
-			}
-		]
-	};
-	dialog.showSaveDialog(options,(f)=>{
-		if(f===undefined){
-			return; // canceled
-		}
-		// prepare image export by repainting
-		repaintAll();
-		// add the background
-		context.globalCompositeOperation='destination-over';
-		context.fillStyle=bgColor;
-		context.fillRect(0,0,canvas.width,canvas.height);
-		var data;
-		if(f.match(/\.png$/i)!==null){
-			// get png data
-			data=canvas.toDataURL('image/png');
-		}else if(f.match(/\.jpe?g$/i)!==null){
-			// get jpg data
-			data=canvas.toDataURL('image/jpeg');
-		}
-		var img=nativeImage.createFromDataURL(data);
-		if(f.match(/\.png$/i)!==null){
-			// get png data
-			data=img.toPNG();
-		}else if(f.match(/\.jpe?g$/i)!==null){
-			// get jpg data
-			data=img.toJPEG(1);
-		}
-		fs.writeFile(f,data,(err)=>{
-			if(err){
-				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
-			}
-		});
-	});
-}
-
 function undo(){
 	if(image.length>0){
 		redoStack.push(image.pop());
@@ -268,6 +216,7 @@ function redo(){
 
 function repaintAll(){
 	if(typeof canvas=='undefined'||typeof context=='undefined'){
+		console.warn("canvas not defined");
 		return;
 	}
 	// clear image
