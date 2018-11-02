@@ -17,27 +17,27 @@ function mousedown(evt){
 	};
 	drawing=true;
 	prevX=evt.clientX-canvas.offsetLeft;
-	prevY=evt.clientY-canvas.offsetTop;
+	prevY=evt.clientY-canvas.offsetTop+window.scrollY;
 	activePath.points.push({
 		x:prevX,
 		y:prevY
 	});
 	// draw a single point
-	context.moveTo(prevX,prevY);
-	context.lineTo(prevX,prevY);
+	context.moveTo(prevX,prevY-window.scrollY);
+	context.lineTo(prevX,prevY-window.scrollY);
 	context.stroke();
 }
 
 function mousemove(evt){
 	if(drawing){
-		context.moveTo(prevX,prevY);
+		context.moveTo(prevX,prevY-window.scrollY);
 		prevX=evt.clientX-canvas.offsetLeft;
-		prevY=evt.clientY-canvas.offsetTop;
+		prevY=evt.clientY-canvas.offsetTop+window.scrollY;
 		activePath.points.push({
 			x:prevX,
 			y:prevY
 		});
-		context.lineTo(prevX,prevY);
+		context.lineTo(prevX,prevY-window.scrollY);
 		context.stroke();
 	}
 	// set erasor cursor
@@ -51,7 +51,7 @@ function mouseup(evt){
 		// this is a real mouse handler call and not a delegation
 		evt.stopPropagation();
 		evt.preventDefault();
-		context.moveTo(prevX,prevY);
+		context.moveTo(prevX,prevY-window.scrollY);
 		prevX=evt.clientX-canvas.offsetLeft;
 		prevY=evt.clientY-canvas.offsetTop+window.scrollY;
 		activePath.points.push({
@@ -69,7 +69,7 @@ function mouseup(evt){
 	redoStack=[];
 	// grey-out the redo button
 	document.getElementById('redo').style.filter="brightness(50%)";
-	context.lineTo(prevX,prevY);
+	context.lineTo(prevX,prevY-window.scrollY);
 	context.stroke();
 	drawing=false;
 }
