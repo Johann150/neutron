@@ -96,19 +96,6 @@ canvas{
 	display:none;
 	transform:translate(-308px,-110%)
 }
-#colours #choose{
-	background:
-		radial-gradient(circle at 50% 0,
-			rgba(255,0,0,1),
-			rgba(255,0,0,0) 80%),
-		radial-gradient(circle at 6.7% 75%,
-			rgba(0,0,255,1),
-			rgba(0,0,255,0) 80%),
-		radial-gradient(circle at 93.3% 75%,
-			rgba(0,255,0,1),
-			rgba(0,255,0,0) 80%);
-	border-radius:50%;
-}
 #red{
 	background-color:#dd0622;
 }
