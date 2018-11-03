@@ -34,7 +34,8 @@ body{
 	z-index:2;
 	border:2px solid white;
 }
-#toolbox{
+#toolbox,
+#colours{
 	background-color:rgba(128, 128, 128, .5);
 	position:fixed;
 	bottom:5px;
@@ -59,11 +60,13 @@ input#colorchooser{
 input#bg{
 	background-image:url("bg.svg");
 }
-#toolbox input,#toolbox a,#toolbox label,#toolbox div{
+#toolbox input,#toolbox a,#toolbox label,#toolbox div,
+#colours input{
 	margin:3px;
 	height:34px;
 	width:34px;
 	border-radius:4px;
+	border:none;
 	outline:none;
 	vertical-align:middle;
 	padding:2px;
@@ -71,8 +74,8 @@ input#bg{
 	overflow:hidden;
 	cursor:pointer;
 }
-#stroke{
-	width:auto;
+#toolbox #stroke{
+	width:122px;
 }
 canvas{
 	display:block;
@@ -88,4 +91,39 @@ canvas{
 }
 #pen:checked + label{
 	background-color:var(--pen-color);
+}
+#colours{
+	display:none;
+	transform:translate(-308px,-110%)
+}
+#colours #choose{
+	background:
+		radial-gradient(circle at 50% 0,
+			rgba(255,0,0,1),
+			rgba(255,0,0,0) 80%),
+		radial-gradient(circle at 6.7% 75%,
+			rgba(0,0,255,1),
+			rgba(0,0,255,0) 80%),
+		radial-gradient(circle at 93.3% 75%,
+			rgba(0,255,0,1),
+			rgba(0,255,0,0) 80%);
+	border-radius:50%;
+}
+#red{
+	background-color:#dd0622;
+}
+#yellow{
+	background-color:#f8ba00;
+}
+#blue{
+	background-color:#2676cc;
+}
+#white{
+	background-color:#ffffff;
+}
+#black{
+	background-color:#000000;
+}
+#chooser{
+	background:url("colours.svg");
 }

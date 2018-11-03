@@ -263,13 +263,28 @@ function penClick(){
 	var pen=document.getElementById('pen');
 	if(pen.getAttribute('data-old')=='true'){
 		// pen was already activated, user wants to change color
-		colorchooser.value=context.strokeStyle;
-		colorchooser.onchange=function(evt){
-			penColor=colorchooser.value;
+		document.getElementById('red').onclick=
+		document.getElementById('yellow').onclick=
+		document.getElementById('blue').onclick=
+		document.getElementById('white').onclick=
+		document.getElementById('black').onclick=
+		function(evt){
+			penColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.setProperty("--pen-color",penColor);
 			saved=false;
+			document.getElementById('colours').style.display="none";
 		};
-		colorchooser.click();
+		document.getElementById('chooser').onclick=function(){
+			colorchooser.value=context.strokeStyle;
+			colorchooser.onchange=function(evt){
+				penColor=colorchooser.value;
+				document.body.style.setProperty("--pen-color",penColor);
+				saved=false;
+			};
+			document.getElementById('colours').style.display="none";
+			colorchooser.click();
+		}
+		document.getElementById('colours').style.display="block";
 	}else{
 		// only activate pen
 		pen.setAttribute('data-old','true');
