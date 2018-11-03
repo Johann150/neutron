@@ -1,5 +1,5 @@
 function getScrollMaxY(){
-	return document.body.scrollHeight-document.body.clientHeight;
+	return document.documentElement.scrollHeight-document.documentElement.clientHeight;
 }
 
 function rgb2hex(rgb){
@@ -10,15 +10,9 @@ function rgb2hex(rgb){
 		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : rgb;
 }
 
-function calculateAspectRatioFit(srcWidth,srcHeight,maxWidth,maxHeight){
-	var ratio=Math.min(maxWidth/srcWidth,maxHeight/srcHeight);
-	return {width:srcWidth*ratio,height:srcHeight*ratio};
-}
-
-function formattedPagePath(numDigits,page){
-	page=page.toString();
-	page=page.padStart(numDigits,'0');
-	return path.join(process.cwd(),"tmp-"+page+".jpg");
+function pointInViewport(point){
+	// x does not need to be checked
+	return (window.scrollY<=point.y&&point.y<window.scrollY+document.documentElement.clientHeight);
 }
 
 Image.prototype.load = function(url){
