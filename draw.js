@@ -263,12 +263,15 @@ function penClick(){
 	var pen=document.getElementById('pen');
 	if(pen.getAttribute('data-old')=='true'){
 		// pen was already activated, user wants to change color
+		document.getElementById('pen').setAttribute('data-old','close');
+
 		document.getElementById('red').onclick=
 		document.getElementById('yellow').onclick=
 		document.getElementById('blue').onclick=
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
+			document.getElementById('pen').setAttribute('data-old','true');
 			penColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.setProperty("--pen-color",penColor);
 			saved=false;
@@ -281,10 +284,15 @@ function penClick(){
 				document.body.style.setProperty("--pen-color",penColor);
 				saved=false;
 			};
+			document.getElementById('pen').setAttribute('data-old','true');
 			document.getElementById('colours').style.display="none";
 			colorchooser.click();
 		}
 		document.getElementById('colours').style.display="block";
+	}else if(pen.getAttribute('data-old')=='close'){
+		// dismiss colour chooser
+		document.getElementById('colours').style.display="none";
+		document.getElementById('pen').setAttribute('data-old','true');
 	}else{
 		// only activate pen
 		pen.setAttribute('data-old','true');
@@ -318,7 +326,12 @@ function bgColorClick(){
 	var btn=document.getElementById('bg-color');
 	if(btn.getAttribute('data-old')=='true'){
 		// background-color was already activated, user wants to change colour
-		document.getElementById('yellow').style.backgroundColor="#063";// replace yellow with green
+
+		// different colour palette for background
+		document.getElementById('red').style.backgroundColor="#063";
+		document.getElementById('yellow').style.backgroundColor="#063";
+
+		// replace yellow with green
 		document.getElementById('red').onclick=
 		document.getElementById('yellow').onclick=
 		document.getElementById('blue').onclick=
@@ -329,6 +342,7 @@ function bgColorClick(){
 			document.body.style.background=bgColor;
 			saved=false;
 			document.getElementById('colours').style.display="none";
+			document.getElementById('bg-color').setAttribute('data-old','true');
 			// undo colour replacement
 			document.getElementById('yellow').style.backgroundColor="#f8ba00";
 		};
@@ -339,10 +353,16 @@ function bgColorClick(){
 				bgColor=colorchooser.value;
 				saved=false;
 			};
+			document.getElementById('bg-color').setAttribute('data-old','true');
 			document.getElementById('colours').style.display="none";
 			colorchooser.click();
 		}
+		document.getElementById('bg-color').setAttribute('data-old','close');
 		document.getElementById('colours').style.display="block";
+	}else if(btn.getAttribute('data-old')=='close'){
+		// dismiss colour chooser
+		document.getElementById('colours').style.display="none";
+		btn.setAttribute('data-old','true');
 	}else{
 		// only activate normal background
 		btn.setAttribute('data-old','true');
