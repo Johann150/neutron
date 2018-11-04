@@ -317,14 +317,32 @@ function strokeChange(){
 function bgColorClick(){
 	var btn=document.getElementById('bg-color');
 	if(btn.getAttribute('data-old')=='true'){
-		// background-color was already activated, user wants to change color
-		colorchooser.value=rgb2hex(document.body.style.backgroundColor);
-		colorchooser.onchange=function(){
-			document.body.style.background=colorchooser.value;
-			bgColor=colorchooser.value;
+		// background-color was already activated, user wants to change colour
+		document.getElementById('yellow').style.backgroundColor="#063";// replace yellow with green
+		document.getElementById('red').onclick=
+		document.getElementById('yellow').onclick=
+		document.getElementById('blue').onclick=
+		document.getElementById('white').onclick=
+		document.getElementById('black').onclick=
+		(evt)=>{
+			bgColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
+			document.body.style.background=bgColor;
 			saved=false;
+			document.getElementById('colours').style.display="none";
+			// undo colour replacement
+			document.getElementById('yellow').style.backgroundColor="#f8ba00";
 		};
-		colorchooser.click();
+		document.getElementById('chooser').onclick=()=>{
+			colorchooser.value=rgb2hex(document.body.style.backgroundColor);
+			colorchooser.onchange=function(evt){
+				document.body.style.background=colorchooser.value;
+				bgColor=colorchooser.value;
+				saved=false;
+			};
+			document.getElementById('colours').style.display="none";
+			colorchooser.click();
+		}
+		document.getElementById('colours').style.display="block";
 	}else{
 		// only activate normal background
 		btn.setAttribute('data-old','true');
