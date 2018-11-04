@@ -262,8 +262,18 @@ function repaintAll(){
 function penClick(){
 	var pen=document.getElementById('pen');
 	if(pen.getAttribute('data-old')=='true'){
+		// cancel the chooser for background colour if it was open
+		if(document.getElementById('bg-color').getAttribute('data-old')=='close'){
+			document.getElementById('bg-color').setAttribute('data-old')=='true';
+		}
+
 		// pen was already activated, user wants to change color
 		document.getElementById('pen').setAttribute('data-old','close');
+
+		// set colour palette for pen
+		document.getElementById('red').style.backgroundColor="#dd0622";
+		document.getElementById('yellow').style.backgroundColor="#f8ba00";
+		document.getElementById('blue').style.backgroundColor="#2676cc";
 
 		document.getElementById('red').onclick=
 		document.getElementById('yellow').onclick=
@@ -325,13 +335,19 @@ function strokeChange(){
 function bgColorClick(){
 	var btn=document.getElementById('bg-color');
 	if(btn.getAttribute('data-old')=='true'){
+		// cancel the chooser for pen colour if it was open
+		if(document.getElementById('pen').getAttribute('data-old')=='close'){
+			document.getElementById('pen').setAttribute('data-old')=='true';
+		}
+
 		// background-color was already activated, user wants to change colour
+		document.getElementById('bg-color').setAttribute('data-old','close');
 
-		// different colour palette for background
+		// set colour palette for background
 		document.getElementById('red').style.backgroundColor="#063";
-		document.getElementById('yellow').style.backgroundColor="#063";
+		document.getElementById('yellow').style.backgroundColor="#343434";
+		document.getElementById('blue').style.backgroundColor="#2C4474";
 
-		// replace yellow with green
 		document.getElementById('red').onclick=
 		document.getElementById('yellow').onclick=
 		document.getElementById('blue').onclick=
@@ -343,8 +359,6 @@ function bgColorClick(){
 			saved=false;
 			document.getElementById('colours').style.display="none";
 			document.getElementById('bg-color').setAttribute('data-old','true');
-			// undo colour replacement
-			document.getElementById('yellow').style.backgroundColor="#f8ba00";
 		};
 		document.getElementById('chooser').onclick=()=>{
 			colorchooser.value=rgb2hex(document.body.style.backgroundColor);
@@ -357,7 +371,6 @@ function bgColorClick(){
 			document.getElementById('colours').style.display="none";
 			colorchooser.click();
 		}
-		document.getElementById('bg-color').setAttribute('data-old','close');
 		document.getElementById('colours').style.display="block";
 	}else if(btn.getAttribute('data-old')=='close'){
 		// dismiss colour chooser
