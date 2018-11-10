@@ -94,16 +94,7 @@ canvas{
 }
 #colours{
 	display:none;
-	transform:translate(-308px,-110%)
-}
-#red{
-	background-color:#dd0622;
-}
-#yellow{
-	background-color:#f8ba00;
-}
-#blue{
-	background-color:#2676cc;
+	transform:translate(-175px,-110%)
 }
 #white{
 	background-color:#ffffff;

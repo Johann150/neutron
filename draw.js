@@ -271,13 +271,20 @@ function penClick(){
 		document.getElementById('pen').setAttribute('data-old','close');
 
 		// set colour palette for pen
-		document.getElementById('red').style.backgroundColor="#dd0622";
-		document.getElementById('yellow').style.backgroundColor="#f8ba00";
-		document.getElementById('blue').style.backgroundColor="#2676cc";
+		document.getElementById('colour-a').style.backgroundColor="#dd0622";
+		document.getElementById('colour-b').style.backgroundColor="#f8ba00";
+		document.getElementById('colour-c').style.backgroundColor="#2676cc";
+		//TODO change colours
+		document.getElementById('colour-d').style.backgroundColor="#2676cc";
+		document.getElementById('colour-e').style.backgroundColor="#2676cc";
+		document.getElementById('colour-f').style.backgroundColor="#2676cc";
 
-		document.getElementById('red').onclick=
-		document.getElementById('yellow').onclick=
-		document.getElementById('blue').onclick=
+		document.getElementById('colour-a').onclick=
+		document.getElementById('colour-b').onclick=
+		document.getElementById('colour-c').onclick=
+		document.getElementById('colour-d').onclick=
+		document.getElementById('colour-e').onclick=
+		document.getElementById('colour-f').onclick=
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
@@ -344,13 +351,20 @@ function bgColorClick(){
 		document.getElementById('bg-color').setAttribute('data-old','close');
 
 		// set colour palette for background
-		document.getElementById('red').style.backgroundColor="#063";
-		document.getElementById('yellow').style.backgroundColor="#343434";
-		document.getElementById('blue').style.backgroundColor="#2C4474";
+		document.getElementById('colour-a').style.backgroundColor="#063";
+		document.getElementById('colour-b').style.backgroundColor="#343434";
+		document.getElementById('colour-c').style.backgroundColor="#2C4474";
+		//TODO change colours
+		document.getElementById('colour-d').style.backgroundColor="#2C4474";
+		document.getElementById('colour-e').style.backgroundColor="#2C4474";
+		document.getElementById('colour-f').style.backgroundColor="#2C4474";
 
-		document.getElementById('red').onclick=
-		document.getElementById('yellow').onclick=
-		document.getElementById('blue').onclick=
+		document.getElementById('colour-a').onclick=
+		document.getElementById('colour-b').onclick=
+		document.getElementById('colour-c').onclick=
+		document.getElementById('colour-d').onclick=
+		document.getElementById('colour-e').onclick=
+		document.getElementById('colour-f').onclick=
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
