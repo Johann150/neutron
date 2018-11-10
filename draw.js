@@ -264,7 +264,7 @@ function penClick(){
 	if(pen.getAttribute('data-old')=='true'){
 		// cancel the chooser for background colour if it was open
 		if(document.getElementById('bg-color').getAttribute('data-old')=='close'){
-			document.getElementById('bg-color').setAttribute('data-old')=='true';
+			document.getElementById('bg-color').setAttribute('data-old','true');
 		}
 
 		// pen was already activated, user wants to change color
@@ -337,7 +337,7 @@ function bgColorClick(){
 	if(btn.getAttribute('data-old')=='true'){
 		// cancel the chooser for pen colour if it was open
 		if(document.getElementById('pen').getAttribute('data-old')=='close'){
-			document.getElementById('pen').setAttribute('data-old')=='true';
+			document.getElementById('pen').setAttribute('data-old','true');
 		}
 
 		// background-color was already activated, user wants to change colour
