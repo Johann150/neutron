@@ -292,7 +292,7 @@ function penClick(){
 			penColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.setProperty("--pen-color",penColor);
 			saved=false;
-			document.getElementById('colours').style.display="none";
+			document.getElementById('colours-wrapper').style.display="none";
 		};
 		document.getElementById('chooser').onclick=()=>{
 			colorchooser.value=context.strokeStyle;
@@ -302,13 +302,13 @@ function penClick(){
 				saved=false;
 			};
 			document.getElementById('pen').setAttribute('data-old','true');
-			document.getElementById('colours').style.display="none";
+			document.getElementById('colours-wrapper').style.display="none";
 			colorchooser.click();
 		}
-		document.getElementById('colours').style.display="block";
+		document.getElementById('colours-wrapper').style.display="block";
 	}else if(pen.getAttribute('data-old')=='close'){
 		// dismiss colour chooser
-		document.getElementById('colours').style.display="none";
+		document.getElementById('colours-wrapper').style.display="none";
 		document.getElementById('pen').setAttribute('data-old','true');
 	}else{
 		// only activate pen
@@ -371,7 +371,7 @@ function bgColorClick(){
 			bgColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.background=bgColor;
 			saved=false;
-			document.getElementById('colours').style.display="none";
+			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('bg-color').setAttribute('data-old','true');
 		};
 		document.getElementById('chooser').onclick=()=>{
@@ -382,13 +382,13 @@ function bgColorClick(){
 				saved=false;
 			};
 			document.getElementById('bg-color').setAttribute('data-old','true');
-			document.getElementById('colours').style.display="none";
+			document.getElementById('colours-wrapper').style.display="none";
 			colorchooser.click();
 		}
-		document.getElementById('colours').style.display="block";
+		document.getElementById('colours-wrapper').style.display="block";
 	}else if(btn.getAttribute('data-old')=='close'){
 		// dismiss colour chooser
-		document.getElementById('colours').style.display="none";
+		document.getElementById('colours-wrapper').style.display="none";
 		btn.setAttribute('data-old','true');
 	}else{
 		// only activate normal background
