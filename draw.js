@@ -274,10 +274,13 @@ function penClick(){
 		document.getElementById('colour-a').style.backgroundColor="#dd0622";
 		document.getElementById('colour-b').style.backgroundColor="#f8ba00";
 		document.getElementById('colour-c').style.backgroundColor="#2676cc";
-		//TODO change colours
-		document.getElementById('colour-d').style.backgroundColor="#2676cc";
-		document.getElementById('colour-e').style.backgroundColor="#2676cc";
-		document.getElementById('colour-f').style.backgroundColor="#2676cc";
+		document.getElementById('colour-d').style.backgroundColor="#0cfc04";
+		document.getElementById('colour-e').style.backgroundColor="#b41c74";
+		document.getElementById('colour-f').style.backgroundColor="#ccd4d4";
+
+		// show additional colours
+		document.getElementById('colour-e').style.display=
+		document.getElementById('colour-f').style.display="initial";
 
 		document.getElementById('colour-a').onclick=
 		document.getElementById('colour-b').onclick=
@@ -294,6 +297,7 @@ function penClick(){
 			saved=false;
 			document.getElementById('colours-wrapper').style.display="none";
 		};
+
 		document.getElementById('chooser').onclick=()=>{
 			colorchooser.value=context.strokeStyle;
 			colorchooser.onchange=function(evt){
@@ -354,17 +358,16 @@ function bgColorClick(){
 		document.getElementById('colour-a').style.backgroundColor="#063";
 		document.getElementById('colour-b').style.backgroundColor="#343434";
 		document.getElementById('colour-c').style.backgroundColor="#2C4474";
-		//TODO change colours
-		document.getElementById('colour-d').style.backgroundColor="#2C4474";
-		document.getElementById('colour-e').style.backgroundColor="#2C4474";
-		document.getElementById('colour-f').style.backgroundColor="#2C4474";
+		document.getElementById('colour-d').style.backgroundColor="#FCD4A3";
+
+		// hide unused colours
+		document.getElementById('colour-e').style.display=
+		document.getElementById('colour-f').style.display="none";
 
 		document.getElementById('colour-a').onclick=
 		document.getElementById('colour-b').onclick=
 		document.getElementById('colour-c').onclick=
 		document.getElementById('colour-d').onclick=
-		document.getElementById('colour-e').onclick=
-		document.getElementById('colour-f').onclick=
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
@@ -374,6 +377,11 @@ function bgColorClick(){
 			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('bg-color').setAttribute('data-old','true');
 		};
+
+		// remove action listener from unused buttons
+		document.getElementById('colour-e').onclick=
+		document.getElementById('colour-f').onclick=()=>{};
+
 		document.getElementById('chooser').onclick=()=>{
 			colorchooser.value=rgb2hex(document.body.style.backgroundColor);
 			colorchooser.onchange=function(evt){
