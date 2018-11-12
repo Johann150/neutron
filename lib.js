@@ -35,3 +35,7 @@ Image.prototype.load = function(url){
 };
 
 Image.prototype.completedPercentage = 0;
+
+Array.prototype.max = function() {
+	return Math.max.apply(null, this);
+};
