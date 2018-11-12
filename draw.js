@@ -3,7 +3,7 @@
 const fs=require('fs');
 const path=require('path');
 const url=require('url');
-const {remote}=require('electron');
+const {remote,nativeImage}=require('electron');
 const {dialog}=require('electron').remote;
 
 var filePath; // file path to use for saving
@@ -49,6 +49,7 @@ function setupHandlers(){
 	document.querySelector('label[for=erase]').onclick=eraseClick;
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
 	document.querySelector('label[for=bg-img]').onclick=bgImgClick;
+	document.getElementById('save-img').onclick=saveImg;
 	document.getElementById('save').onclick=fileSave;
 	document.getElementById('open').onclick=fileOpen;
 	document.getElementById('undo').onclick=undo;
@@ -180,6 +181,89 @@ function setup(){
 		checkTemplateFile();
 		checkTemplateFile=false;
 	}
+}
+
+/*
+only saves background colour and what was written
+background images will be ignored
+*/
+function saveImg(){
+	var date=new Date();
+	let options={
+		title:'Als Bild speichern',
+		buttonLabel:'Speichern',
+		defaultPath:date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate(),
+		filters:[
+			{
+				name:'PNG-Bild',
+				extensions:['png']
+			},
+			{
+				name:'JPEG-Bild',
+				extensions:['jpg','jpeg']
+			}
+		]
+	};
+	dialog.showSaveDialog(options,(f)=>{
+		if(f===undefined){
+			return; // canceled
+		}
+		var canv,ctx;
+		canv=document.createElement('canvas');
+		canv.width=document.body.clientWidth;
+		canv.height=document.body.clientHeight;
+		ctx=canv.getContext('2d');
+		// clear image
+		ctx.clearRect(0,0,canv.width,canv.height);
+		// paint all paths
+		for(var i=0;i<image.length;i++){
+			ctx.beginPath();
+			var path=image[i];
+			if(path==null){
+				continue;
+			}
+			// set appearance
+			ctx.strokeStyle=path.color;
+			ctx.lineWidth=path.width+1;
+			ctx.globalCompositeOperation=path.gco;
+			// add all points
+			var point=path.points[0];
+			ctx.moveTo(point.x,point.y);
+			// start at 0 again to also draw single points
+			for(var j=0;j<path.points.length;j++){
+				point=path.points[j];
+				ctx.lineTo(point.x,point.y);
+			}
+			// draw!
+			ctx.stroke();
+		}
+		// add the background
+		ctx.globalCompositeOperation='destination-over';
+		ctx.fillStyle=bgColor;
+		ctx.fillRect(0,0,canv.width,canv.height);
+		// save image
+		var data;
+		if(f.match(/\.png$/i)!==null){
+			// get png data
+			data=canv.toDataURL('image/png');
+		}else if(f.match(/\.jpe?g$/i)!==null){
+			// get jpg data
+			data=canv.toDataURL('image/jpeg');
+		}
+		var img=nativeImage.createFromDataURL(data);
+		if(f.match(/\.png$/i)!==null){
+			// get png data
+			data=img.toPNG();
+		}else if(f.match(/\.jpe?g$/i)!==null){
+			// get jpg data
+			data=img.toJPEG(1);
+		}
+		fs.writeFile(f,data,(err)=>{
+			if(err){
+				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
+			}
+		});
+	});
 }
 
 function down(){
