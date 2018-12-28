@@ -91,7 +91,7 @@ function setup(){
 	document.body.style.setProperty("--pen-color",penColor);
 	bgColor="#006633";
 	grid=false;
-	document.body.style.background=bgColor;
+	document.body.style.backgroundColour=bgColor;
 	penWidth=2;
 	eraseWidth=50;
 	document.getElementById('stroke').value=penWidth;
@@ -456,7 +456,7 @@ function bgColorClick(){
 		document.getElementById('black').onclick=
 		(evt)=>{
 			bgColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
-			document.body.style.background=bgColor;
+			document.body.style.backgroundColor=bgColor;
 			saved=false;
 			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('bg-color').setAttribute('data-old','true');
@@ -469,7 +469,7 @@ function bgColorClick(){
 		document.getElementById('chooser').onclick=()=>{
 			colorchooser.value=rgb2hex(document.body.style.backgroundColor);
 			colorchooser.onchange=function(evt){
-				document.body.style.background=colorchooser.value;
+				document.body.style.backgroundColor=colorchooser.value;
 				bgColor=colorchooser.value;
 				saved=false;
 			};
@@ -485,61 +485,13 @@ function bgColorClick(){
 	}else{
 		// only activate normal background
 		btn.setAttribute('data-old','true');
-		document.body.style.background=bgColor;
+		document.body.style.backgroundColor=bgColor;
 	}
 }
 
-function bgImgClick(){
-	var btn=document.getElementById('bg-color');
-	if(btn.getAttribute('data-old')=='false'||bgImg==null){
-		// change image
-		let options={
-			title:'Hintergrundbild öffnen',
-			defaultPath:process.cwd(),
-			buttonLabel:'Öffnen',
-			filters:[
-				{
-					name:'Alle',
-					extensions:['png','jpg','jpeg']
-				}
-			],
-			properties:['openFile']
-		};
-		dialog.showOpenDialog(options,(f)=>{
-			if(typeof f!=='undefined'){
-				var bgPath=f[0];
-				fs.stat(bgPath,(err,stat)=>{
-					if(err==null){
-						// file exists
-						var img=new Image();
-						img.onload=function(){
-							var canv=document.createElement('canvas');
-							if(this.naturalWidth>1600){
-								// if too big resize image so the data url does not get too large
-								canv.width=1600;
-								// resize appropriately
-								canv.height=this.naturalHeight*1600/this.naturalWidth;
-							}else{
-								canv.width=this.naturalWidth;
-								canv.height=this.naturalHeight;
-							}
-							canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
-							bgImg=canv.toDataURL('image/png');
-							// remove background colour and use image instead
-							document.body.style.background="";
-							document.body.style.backgroundImage="url("+bgImg+")";
-						};
-						img.src=bgPath;
-					}
-				});
-			}
-		});
-	}else{
-		// only activate background image
-		btn.setAttribute('data-old','false');
-		document.body.style.background="";
-		document.body.style.backgroundImage="url("+bgImg+")";
-	}
+function gridClick(){
+	grid=!grid;
+	document.body.classList.toggle('grid');
 	saved=false;
 }
 
@@ -547,7 +499,8 @@ function fileSave(closing){
 	var closing=(typeof closing!=='undefined')?closing:false;
 	var data={
 		image:image,
-		bg:document.body.style.background,
+		bg:document.body.style.backgroundColor,
+		grid:grid,
 		penWidth:penWidth,
 		penColor:penColor,
 		eraseWidth:eraseWidth,
@@ -695,16 +648,7 @@ function _fileRead(f){
 	setup();
 	// load data
 	var data=JSON.parse(fs.readFileSync(f));
-	if(data.bg.startsWith('url(')){
-		// background image
-		bgImg=data.bg.substr(4);
-		bgImg=bgImg.substr(0,bgImg.length-1);
-		// switch on corresponding button
-		document.getElementById('bg-img').checked=true;
-		document.getElementById('bg-color').setAttribute('data-old','false');
-	}else{
-		bgColor=rgb2hex(data.bg);
-	}
+	bgColor=rgb2hex(data.bg);
 	if(data.image==null){
 		image=[];
 		document.getElementById('undo').style.filter="brightness(50%)";
@@ -733,12 +677,7 @@ function _fileRead(f){
 	}else{
 		document.getElementById('redo').style.filter="brightness(50%)";
 	}
-	if(bgImg==null){
-		document.body.style.background=bgColor;
-	}else{
-		document.body.style.background="";
-		document.body.style.backgroundImage="url("+bgImg+")";
-	}
+	document.body.style.backgroundColour=bgColor;
 	penWidth=data.penWidth;
 	document.getElementById('stroke').value=penWidth;
 	penColor=data.penColor;
