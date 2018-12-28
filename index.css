@@ -84,6 +84,7 @@ canvas{
 	cursor:url(pen.cur),crosshair;
 	z-index:0;
 }
+#bg-color,
 .toggle{
 	display:none;
 }

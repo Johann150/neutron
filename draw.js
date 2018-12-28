@@ -347,12 +347,12 @@ function penClick(){
 	var pen=document.getElementById('pen');
 	if(pen.getAttribute('data-old')=='true'){
 		// cancel the chooser for background colour if it was open
-		if(document.getElementById('bg-color').getAttribute('data-old')=='close'){
-			document.getElementById('bg-color').setAttribute('data-old','true');
+		if(document.getElementById('bg-color').getAttribute('data-open')=='true'){
+			document.getElementById('bg-color').setAttribute('data-open','false');
 		}
 
 		// pen was already activated, user wants to change color
-		document.getElementById('pen').setAttribute('data-old','close');
+		pen.setAttribute('data-old','close');
 
 		// set colour palette for pen
 		document.getElementById('colour-a').style.backgroundColor="#dd0622";
@@ -375,7 +375,7 @@ function penClick(){
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
-			document.getElementById('pen').setAttribute('data-old','true');
+			pen.setAttribute('data-old','true');
 			penColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.setProperty("--pen-color",penColor);
 			saved=false;
@@ -389,7 +389,7 @@ function penClick(){
 				document.body.style.setProperty("--pen-color",penColor);
 				saved=false;
 			};
-			document.getElementById('pen').setAttribute('data-old','true');
+			pen.setAttribute('data-old','true');
 			document.getElementById('colours-wrapper').style.display="none";
 			colorchooser.click();
 		}
@@ -397,7 +397,7 @@ function penClick(){
 	}else if(pen.getAttribute('data-old')=='close'){
 		// dismiss colour chooser
 		document.getElementById('colours-wrapper').style.display="none";
-		document.getElementById('pen').setAttribute('data-old','true');
+		pen.setAttribute('data-old','true');
 	}else{
 		// only activate pen
 		pen.setAttribute('data-old','true');
@@ -409,6 +409,10 @@ function penClick(){
 
 function eraseClick(){
 	var pen=document.getElementById('pen');
+	// dismiss colour chooser if it was open
+	if(pen.getAttribute('data-old')=='close'){
+		document.getElementById('colours-wrapper').style.display="none";
+	}
 	pen.setAttribute('data-old','false');
 	document.getElementById('stroke').value=eraseWidth;
 	document.getElementById('erase-cur').style.display="block";
@@ -429,14 +433,16 @@ function strokeChange(){
 
 function bgColorClick(){
 	var btn=document.getElementById('bg-color');
-	if(btn.getAttribute('data-old')=='true'){
+	if(btn.getAttribute('data-open')=='true'){
+		// dismiss colour chooser
+		document.getElementById('colours-wrapper').style.display="none";
+		btn.setAttribute('data-open','true');
+	}else{
 		// cancel the chooser for pen colour if it was open
 		if(document.getElementById('pen').getAttribute('data-old')=='close'){
 			document.getElementById('pen').setAttribute('data-old','true');
 		}
 
-		// background-color was already activated, user wants to change colour
-		document.getElementById('bg-color').setAttribute('data-old','close');
 
 		// set colour palette for background
 		document.getElementById('colour-a').style.backgroundColor="#063";
@@ -459,7 +465,7 @@ function bgColorClick(){
 			document.body.style.backgroundColor=bgColor;
 			saved=false;
 			document.getElementById('colours-wrapper').style.display="none";
-			document.getElementById('bg-color').setAttribute('data-old','true');
+			document.getElementById('bg-color').setAttribute('data-open','false');
 		};
 
 		// remove action listener from unused buttons
@@ -473,19 +479,13 @@ function bgColorClick(){
 				bgColor=colorchooser.value;
 				saved=false;
 			};
-			document.getElementById('bg-color').setAttribute('data-old','true');
+			document.getElementById('bg-color').setAttribute('data-open','false');
 			document.getElementById('colours-wrapper').style.display="none";
 			colorchooser.click();
 		}
+
+		document.getElementById('bg-color').setAttribute('data-open','true');
 		document.getElementById('colours-wrapper').style.display="block";
-	}else if(btn.getAttribute('data-old')=='close'){
-		// dismiss colour chooser
-		document.getElementById('colours-wrapper').style.display="none";
-		btn.setAttribute('data-old','true');
-	}else{
-		// only activate normal background
-		btn.setAttribute('data-old','true');
-		document.body.style.backgroundColor=bgColor;
 	}
 }
 
