@@ -17,7 +17,6 @@ var activePath; // object storing information on how to recreate a certain drawi
 var redoStack; // array storing former activePath's that have been undone to be redone
 var penColor; // the current colour used to draw as a string (e.g. "#ffffff")
 var bgColor; // the current colour used for the background as a css value (e.g)
-var bgImg; // image data for a background image
 var penWidth; // width used to draw with the pen tool
 var eraseWidth; // width used to erase something; usually >penWidth
 var colorchooser; // DOM element: <input type="color">
@@ -25,6 +24,7 @@ var drawing; // boolean, wether the user is drawing at the moment
 var prevX; // the previous x coordinate when drawing
 var prevY; // the previous y coordinate when drawing
 var saved; // boolean, wether the active state has been modified since the last save
+var grid; // boolean, wether the grid is visisble or not
 
 function resize(h){
 	// check that the body isn't already the right size
@@ -48,7 +48,7 @@ function setupHandlers(){
 	document.querySelector('label[for=pen]').onclick=penClick;
 	document.querySelector('label[for=erase]').onclick=eraseClick;
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
-	document.querySelector('label[for=bg-img]').onclick=bgImgClick;
+	document.querySelector('label[for=grid]').onclick=gridClick;
 	document.getElementById('save-img').onclick=saveImg;
 	document.getElementById('save').onclick=fileSave;
 	document.getElementById('open').onclick=fileOpen;
@@ -90,7 +90,7 @@ function setup(){
 	penColor="#ffffff";
 	document.body.style.setProperty("--pen-color",penColor);
 	bgColor="#006633";
-	bgImg=null;
+	grid=false;
 	document.body.style.background=bgColor;
 	penWidth=2;
 	eraseWidth=50;
