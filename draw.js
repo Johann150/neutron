@@ -261,6 +261,7 @@ function saveImg(){
 		fs.writeFile(f,data,(err)=>{
 			if(err){
 				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
+				console.error("saving error:"+err.message);
 			}
 		});
 	});
@@ -530,6 +531,7 @@ function fileSave(closing){
 				fs.writeFile(f,JSON.stringify(data),(err)=>{
 					if(err){
 						alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
+						console.error("saving error:"+err.message);
 						// we don't want to close the program if there was an error
 					}else{
 						// saving done sucessfully.
@@ -546,6 +548,7 @@ function fileSave(closing){
 		fs.writeFile(filePath,JSON.stringify(data),(err)=>{
 			if(err){
 				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
+				console.error("saving error:"+err.message);
 			}else{
 				saved=true;
 				if(closing){
