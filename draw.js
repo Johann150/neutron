@@ -505,8 +505,8 @@ function fileSave(closing){
 		penColor:penColor,
 		eraseWidth:eraseWidth,
 		redoStack:redoStack,
-		width:canvas.width,
-		height:canvas.height
+		width:document.body.clientWidth,
+		height:document.body.clientHeight
 	};
 	if(filePath===undefined){
 		var date=new Date();
@@ -685,6 +685,10 @@ function _fileRead(f){
 	document.body.style.setProperty("--pen-color",penColor);
 	eraseWidth=data.eraseWidth;
 	saved=true;
+	// make sure everything will be visible
+	for(var i=0;i<image.length;i++){
+		document.body.style.height=Math.max(image[i].points.max(),document.body.style.height);
+	}
 }
 
 // start neutron
