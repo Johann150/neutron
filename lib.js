@@ -15,23 +15,6 @@ function pointInViewport(point){
 	return (window.scrollY<=point.y&&point.y<window.scrollY+document.documentElement.clientHeight);
 }
 
-Image.prototype.load = function(url){
-	var thisImg = this;
-	var xmlHTTP = new XMLHttpRequest();
-	xmlHTTP.open('GET', url,true);
-	xmlHTTP.responseType = 'arraybuffer';
-	xmlHTTP.onload = function(e) {
-		var blob = new Blob([this.response]);
-		thisImg.src = window.URL.createObjectURL(blob);
-		thisImg.onload();
-	};
-	xmlHTTP.onprogress = function(e) {
-		thisImg.completedPercentage = parseInt((e.loaded / e.total) * 100);
-	};
-	xmlHTTP.onloadstart = function() {
-		thisImg.completedPercentage = 0;
-	};
-	xmlHTTP.send();
+Array.prototype.max = function() {
+	return Math.max.apply(null, this);
 };
-
-Image.prototype.completedPercentage = 0;

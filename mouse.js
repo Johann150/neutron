@@ -61,7 +61,6 @@ function mouseup(evt){
 	}
 	// save what was drawn
 	image.push(activePath);
-	console.log("push activePath");
 	saved=false;
 	// display undo button as normal
 	document.getElementById('undo').style.filter="";

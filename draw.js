@@ -17,7 +17,6 @@ var activePath; // object storing information on how to recreate a certain drawi
 var redoStack; // array storing former activePath's that have been undone to be redone
 var penColor; // the current colour used to draw as a string (e.g. "#ffffff")
 var bgColor; // the current colour used for the background as a css value (e.g)
-var bgImg; // image data for a background image
 var penWidth; // width used to draw with the pen tool
 var eraseWidth; // width used to erase something; usually >penWidth
 var colorchooser; // DOM element: <input type="color">
@@ -25,6 +24,7 @@ var drawing; // boolean, wether the user is drawing at the moment
 var prevX; // the previous x coordinate when drawing
 var prevY; // the previous y coordinate when drawing
 var saved; // boolean, wether the active state has been modified since the last save
+var grid; // boolean, wether the grid is visisble or not
 
 function resize(h){
 	// check that the body isn't already the right size
@@ -48,7 +48,7 @@ function setupHandlers(){
 	document.querySelector('label[for=pen]').onclick=penClick;
 	document.querySelector('label[for=erase]').onclick=eraseClick;
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
-	document.querySelector('label[for=bg-img]').onclick=bgImgClick;
+	document.querySelector('label[for=grid]').onclick=gridClick;
 	document.getElementById('save-img').onclick=saveImg;
 	document.getElementById('save').onclick=fileSave;
 	document.getElementById('open').onclick=fileOpen;
@@ -90,8 +90,8 @@ function setup(){
 	penColor="#ffffff";
 	document.body.style.setProperty("--pen-color",penColor);
 	bgColor="#006633";
-	bgImg=null;
-	document.body.style.background=bgColor;
+	grid=false;
+	document.body.style.backgroundColour=bgColor;
 	penWidth=2;
 	eraseWidth=50;
 	document.getElementById('stroke').value=penWidth;
@@ -261,6 +261,7 @@ function saveImg(){
 		fs.writeFile(f,data,(err)=>{
 			if(err){
 				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
+				console.error("saving error:"+err.message);
 			}
 		});
 	});
@@ -347,12 +348,12 @@ function penClick(){
 	var pen=document.getElementById('pen');
 	if(pen.getAttribute('data-old')=='true'){
 		// cancel the chooser for background colour if it was open
-		if(document.getElementById('bg-color').getAttribute('data-old')=='close'){
-			document.getElementById('bg-color').setAttribute('data-old','true');
+		if(document.getElementById('bg-color').getAttribute('data-open')=='true'){
+			document.getElementById('bg-color').setAttribute('data-open','false');
 		}
 
 		// pen was already activated, user wants to change color
-		document.getElementById('pen').setAttribute('data-old','close');
+		pen.setAttribute('data-old','close');
 
 		// set colour palette for pen
 		document.getElementById('colour-a').style.backgroundColor="#dd0622";
@@ -375,7 +376,7 @@ function penClick(){
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
-			document.getElementById('pen').setAttribute('data-old','true');
+			pen.setAttribute('data-old','true');
 			penColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.setProperty("--pen-color",penColor);
 			saved=false;
@@ -389,7 +390,7 @@ function penClick(){
 				document.body.style.setProperty("--pen-color",penColor);
 				saved=false;
 			};
-			document.getElementById('pen').setAttribute('data-old','true');
+			pen.setAttribute('data-old','true');
 			document.getElementById('colours-wrapper').style.display="none";
 			colorchooser.click();
 		}
@@ -397,7 +398,7 @@ function penClick(){
 	}else if(pen.getAttribute('data-old')=='close'){
 		// dismiss colour chooser
 		document.getElementById('colours-wrapper').style.display="none";
-		document.getElementById('pen').setAttribute('data-old','true');
+		pen.setAttribute('data-old','true');
 	}else{
 		// only activate pen
 		pen.setAttribute('data-old','true');
@@ -409,6 +410,10 @@ function penClick(){
 
 function eraseClick(){
 	var pen=document.getElementById('pen');
+	// dismiss colour chooser if it was open
+	if(pen.getAttribute('data-old')=='close'){
+		document.getElementById('colours-wrapper').style.display="none";
+	}
 	pen.setAttribute('data-old','false');
 	document.getElementById('stroke').value=eraseWidth;
 	document.getElementById('erase-cur').style.display="block";
@@ -429,14 +434,16 @@ function strokeChange(){
 
 function bgColorClick(){
 	var btn=document.getElementById('bg-color');
-	if(btn.getAttribute('data-old')=='true'){
+	if(btn.getAttribute('data-open')=='true'){
+		// dismiss colour chooser
+		document.getElementById('colours-wrapper').style.display="none";
+		btn.setAttribute('data-open','true');
+	}else{
 		// cancel the chooser for pen colour if it was open
 		if(document.getElementById('pen').getAttribute('data-old')=='close'){
 			document.getElementById('pen').setAttribute('data-old','true');
 		}
 
-		// background-color was already activated, user wants to change colour
-		document.getElementById('bg-color').setAttribute('data-old','close');
 
 		// set colour palette for background
 		document.getElementById('colour-a').style.backgroundColor="#063";
@@ -456,10 +463,10 @@ function bgColorClick(){
 		document.getElementById('black').onclick=
 		(evt)=>{
 			bgColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
-			document.body.style.background=bgColor;
+			document.body.style.backgroundColor=bgColor;
 			saved=false;
 			document.getElementById('colours-wrapper').style.display="none";
-			document.getElementById('bg-color').setAttribute('data-old','true');
+			document.getElementById('bg-color').setAttribute('data-open','false');
 		};
 
 		// remove action listener from unused buttons
@@ -469,77 +476,23 @@ function bgColorClick(){
 		document.getElementById('chooser').onclick=()=>{
 			colorchooser.value=rgb2hex(document.body.style.backgroundColor);
 			colorchooser.onchange=function(evt){
-				document.body.style.background=colorchooser.value;
+				document.body.style.backgroundColor=colorchooser.value;
 				bgColor=colorchooser.value;
 				saved=false;
 			};
-			document.getElementById('bg-color').setAttribute('data-old','true');
+			document.getElementById('bg-color').setAttribute('data-open','false');
 			document.getElementById('colours-wrapper').style.display="none";
 			colorchooser.click();
 		}
+
+		document.getElementById('bg-color').setAttribute('data-open','true');
 		document.getElementById('colours-wrapper').style.display="block";
-	}else if(btn.getAttribute('data-old')=='close'){
-		// dismiss colour chooser
-		document.getElementById('colours-wrapper').style.display="none";
-		btn.setAttribute('data-old','true');
-	}else{
-		// only activate normal background
-		btn.setAttribute('data-old','true');
-		document.body.style.background=bgColor;
 	}
 }
 
-function bgImgClick(){
-	var btn=document.getElementById('bg-color');
-	if(btn.getAttribute('data-old')=='false'||bgImg==null){
-		// change image
-		let options={
-			title:'Hintergrundbild öffnen',
-			defaultPath:process.cwd(),
-			buttonLabel:'Öffnen',
-			filters:[
-				{
-					name:'Alle',
-					extensions:['png','jpg','jpeg']
-				}
-			],
-			properties:['openFile']
-		};
-		dialog.showOpenDialog(options,(f)=>{
-			if(typeof f!=='undefined'){
-				var bgPath=f[0];
-				fs.stat(bgPath,(err,stat)=>{
-					if(err==null){
-						// file exists
-						var img=new Image();
-						img.onload=function(){
-							var canv=document.createElement('canvas');
-							if(this.naturalWidth>1600){
-								// if too big resize image so the data url does not get too large
-								canv.width=1600;
-								// resize appropriately
-								canv.height=this.naturalHeight*1600/this.naturalWidth;
-							}else{
-								canv.width=this.naturalWidth;
-								canv.height=this.naturalHeight;
-							}
-							canv.getContext('2d').drawImage(this,0,0,canv.width,canv.height);
-							bgImg=canv.toDataURL('image/png');
-							// remove background colour and use image instead
-							document.body.style.background="";
-							document.body.style.backgroundImage="url("+bgImg+")";
-						};
-						img.src=bgPath;
-					}
-				});
-			}
-		});
-	}else{
-		// only activate background image
-		btn.setAttribute('data-old','false');
-		document.body.style.background="";
-		document.body.style.backgroundImage="url("+bgImg+")";
-	}
+function gridClick(){
+	grid=!grid;
+	document.body.classList.toggle('grid');
 	saved=false;
 }
 
@@ -547,13 +500,14 @@ function fileSave(closing){
 	var closing=(typeof closing!=='undefined')?closing:false;
 	var data={
 		image:image,
-		bg:document.body.style.background,
+		bg:document.body.style.backgroundColor,
+		grid:grid,
 		penWidth:penWidth,
 		penColor:penColor,
 		eraseWidth:eraseWidth,
 		redoStack:redoStack,
-		width:canvas.width,
-		height:canvas.height
+		width:document.body.clientWidth,
+		height:document.body.clientHeight
 	};
 	if(filePath===undefined){
 		var date=new Date();
@@ -577,6 +531,7 @@ function fileSave(closing){
 				fs.writeFile(f,JSON.stringify(data),(err)=>{
 					if(err){
 						alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
+						console.error("saving error:"+err.message);
 						// we don't want to close the program if there was an error
 					}else{
 						// saving done sucessfully.
@@ -593,6 +548,7 @@ function fileSave(closing){
 		fs.writeFile(filePath,JSON.stringify(data),(err)=>{
 			if(err){
 				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
+				console.error("saving error:"+err.message);
 			}else{
 				saved=true;
 				if(closing){
@@ -695,16 +651,7 @@ function _fileRead(f){
 	setup();
 	// load data
 	var data=JSON.parse(fs.readFileSync(f));
-	if(data.bg.startsWith('url(')){
-		// background image
-		bgImg=data.bg.substr(4);
-		bgImg=bgImg.substr(0,bgImg.length-1);
-		// switch on corresponding button
-		document.getElementById('bg-img').checked=true;
-		document.getElementById('bg-color').setAttribute('data-old','false');
-	}else{
-		bgColor=rgb2hex(data.bg);
-	}
+	bgColor=rgb2hex(data.bg);
 	if(data.image==null){
 		image=[];
 		document.getElementById('undo').style.filter="brightness(50%)";
@@ -733,12 +680,7 @@ function _fileRead(f){
 	}else{
 		document.getElementById('redo').style.filter="brightness(50%)";
 	}
-	if(bgImg==null){
-		document.body.style.background=bgColor;
-	}else{
-		document.body.style.background="";
-		document.body.style.backgroundImage="url("+bgImg+")";
-	}
+	document.body.style.backgroundColour=bgColor;
 	penWidth=data.penWidth;
 	document.getElementById('stroke').value=penWidth;
 	penColor=data.penColor;
@@ -746,6 +688,10 @@ function _fileRead(f){
 	document.body.style.setProperty("--pen-color",penColor);
 	eraseWidth=data.eraseWidth;
 	saved=true;
+	// make sure everything will be visible
+	for(var i=0;i<image.length;i++){
+		document.body.style.height=Math.max(image[i].points.max(),document.body.style.height);
+	}
 }
 
 // start neutron
