@@ -96,9 +96,8 @@ canvas{
 }
 #colours-wrapper{
 	display:none;
-	width:568px;
+	width:611px;
 	transform:translateY(-110%);
-	text-align:left;
 	background:none;
 }
 #colours{
