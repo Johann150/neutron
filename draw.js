@@ -90,7 +90,7 @@ function setup(){
 	penColor="#ffffff";
 	document.body.style.setProperty("--pen-color",penColor);
 	bgColor="#006633";
-	grid=false;
+	grid="transparent";
 	document.body.style.backgroundColour=bgColor;
 	penWidth=2;
 	eraseWidth=50;
@@ -490,10 +490,29 @@ function bgColorClick(){
 	}
 }
 
-function gridClick(){
-	grid=!grid;
-	document.body.classList.toggle('grid');
-	saved=false;
+function gridClick(evt){
+	var g=document.getElementById('grid');
+	if(g.checked){
+		if(g.getAttribute('data-old')=='true'){
+			// change colour
+			colorchooser.value=rgb2hex(grid);
+			colorchooser.onchange=function(evt){
+				grid=colorchooser.value;
+				document.body.style.setProperty('--grid-color',grid);
+				saved=false;
+			};
+			g.setAttribute('data-old','false');
+			colorchooser.click();
+			evt.preventDefault();
+		}else{
+			document.body.classList.remove('grid');
+			g.setAttribute('data-old','true');
+			saved=false;
+		}
+	}else{
+		document.body.classList.add('grid');
+		saved=false;
+	}
 }
 
 function fileSave(closing){
@@ -507,7 +526,8 @@ function fileSave(closing){
 		eraseWidth:eraseWidth,
 		redoStack:redoStack,
 		width:document.body.clientWidth,
-		height:document.body.clientHeight
+		height:document.body.clientHeight,
+		grid:(document.body.classList.contains('grid')?grid:'transparent')
 	};
 	if(filePath===undefined){
 		var date=new Date();
