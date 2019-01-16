@@ -368,6 +368,8 @@ function penClick(){
 		document.getElementById('colour-f').style.backgroundColor="#ccd4d4";
 
 		// show additional colours
+		document.getElementById('colour-c').style.display=
+		document.getElementById('colour-d').style.display=
 		document.getElementById('colour-e').style.display=
 		document.getElementById('colour-f').style.display="initial";
 
@@ -458,6 +460,10 @@ function bgColorClick(){
 		document.getElementById('colour-c').style.backgroundColor="#2C4474";
 		document.getElementById('colour-d').style.backgroundColor="#FCD4A3";
 
+		// show additional colours
+		document.getElementById('colour-c').style.display=
+		document.getElementById('colour-d').style.display="initial";
+
 		// hide unused colours
 		document.getElementById('colour-e').style.display=
 		document.getElementById('colour-f').style.display="none";
@@ -514,19 +520,17 @@ function gridClick(evt){
 		g.setAttribute('data-old','1');
 
 		// set colour palette for grid
-		document.getElementById('colour-a').style.backgroundColor="#660e00";
-		document.getElementById('colour-b').style.backgroundColor="#343434";
-		document.getElementById('colour-c').style.backgroundColor="#2C4474";
-		document.getElementById('colour-d').style.backgroundColor="#70699e";
+		document.getElementById('colour-a').style.backgroundColor="#eaeaea";
+		document.getElementById('colour-b').style.backgroundColor="#4c4c4c";
 
 		// hide unused colours
+		document.getElementById('colour-c').style.display=
+		document.getElementById('colour-d').style.display=
 		document.getElementById('colour-e').style.display=
 		document.getElementById('colour-f').style.display="none";
 
 		document.getElementById('colour-a').onclick=
 		document.getElementById('colour-b').onclick=
-		document.getElementById('colour-c').onclick=
-		document.getElementById('colour-d').onclick=
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
@@ -538,6 +542,8 @@ function gridClick(evt){
 		};
 
 		// remove action listener from unused buttons
+		document.getElementById('colour-c').onclick=
+		document.getElementById('colour-d').onclick=
 		document.getElementById('colour-e').onclick=
 		document.getElementById('colour-f').onclick=()=>{};
 
