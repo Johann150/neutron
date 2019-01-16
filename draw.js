@@ -351,6 +351,10 @@ function penClick(){
 		if(document.getElementById('bg-color').getAttribute('data-open')=='true'){
 			document.getElementById('bg-color').setAttribute('data-open','false');
 		}
+		// cancel the chooser for grid colour if it was open
+		if(document.getElementById('grid').getAttribute('data-open')=='1'){
+			document.getElementById('grid').setAttribute('data-open','0');
+		}
 
 		// pen was already activated, user wants to change color
 		pen.setAttribute('data-old','close');
@@ -443,7 +447,10 @@ function bgColorClick(){
 		if(document.getElementById('pen').getAttribute('data-old')=='close'){
 			document.getElementById('pen').setAttribute('data-old','true');
 		}
-
+		// cancel the chooser for grid colour if it was open
+		if(document.getElementById('grid').getAttribute('data-open')=='1'){
+			document.getElementById('grid').setAttribute('data-open','0');
+		}
 
 		// set colour palette for background
 		document.getElementById('colour-a').style.backgroundColor="#063";
@@ -491,27 +498,78 @@ function bgColorClick(){
 }
 
 function gridClick(evt){
+	evt.preventDefault();
 	var g=document.getElementById('grid');
-	if(g.checked){
-		if(g.getAttribute('data-old')=='true'){
-			// change colour
-			colorchooser.value=rgb2hex(grid);
+	if(g.getAttribute('data-old')=='0'){
+		// cancel the chooser for pen colour if it was open
+		if(document.getElementById('pen').getAttribute('data-old')=='close'){
+			document.getElementById('pen').setAttribute('data-old','true');
+		}
+		// cancel the chooser for background colour if it was open
+		if(document.getElementById('bg-color').getAttribute('data-open')=='true'){
+			document.getElementById('bg-color').setAttribute('data-open','false');
+		}
+
+		// grid was already activated, user wants to change color
+		g.setAttribute('data-old','1');
+
+		// set colour palette for grid
+		document.getElementById('colour-a').style.backgroundColor="#660e00";
+		document.getElementById('colour-b').style.backgroundColor="#343434";
+		document.getElementById('colour-c').style.backgroundColor="#2C4474";
+		document.getElementById('colour-d').style.backgroundColor="#70699e";
+
+		// hide unused colours
+		document.getElementById('colour-e').style.display=
+		document.getElementById('colour-f').style.display="none";
+
+		document.getElementById('colour-a').onclick=
+		document.getElementById('colour-b').onclick=
+		document.getElementById('colour-c').onclick=
+		document.getElementById('colour-d').onclick=
+		document.getElementById('white').onclick=
+		document.getElementById('black').onclick=
+		(evt)=>{
+			grid=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
+			document.body.style.setProperty('--grid-color',grid);
+			saved=false;
+			document.getElementById('colours-wrapper').style.display="none";
+			document.getElementById('grid').setAttribute('data-old','2');
+		};
+
+		// remove action listener from unused buttons
+		document.getElementById('colour-e').onclick=
+		document.getElementById('colour-f').onclick=()=>{};
+
+		document.getElementById('chooser').onclick=()=>{
+			colorchooser.value=rgb2hex(document.body.style.backgroundColor);
 			colorchooser.onchange=function(evt){
-				grid=colorchooser.value;
-				document.body.style.setProperty('--grid-color',grid);
+				document.body.style.backgroundColor=colorchooser.value;
+				bgColor=colorchooser.value;
 				saved=false;
 			};
-			g.setAttribute('data-old','false');
-			colorchooser.click();
+			document.getElementById('colours-wrapper').style.display="none";
+			document.getElementById('grid').setAttribute('data-old','2');
 			evt.preventDefault();
-		}else{
-			document.body.classList.remove('grid');
-			g.setAttribute('data-old','true');
-			saved=false;
+			colorchooser.click();
 		}
-	}else{
+		document.getElementById('colours-wrapper').style.display="block";
+		g.checked=true;
+	}else if(g.getAttribute('data-old')=='1'){
+		// dismiss colour chooser
+		document.getElementById('colours-wrapper').style.display="none";
+		g.setAttribute('data-old','2');
+		g.checked=true;
+	}else if(g.getAttribute('data-old')=='2'){
+		// deactivate grid
+		document.body.classList.remove('grid');
+		g.setAttribute('data-old','3');
+		g.checked=false;
+	}else if(g.getAttribute('data-old')=='3'){
+		// activate grid
 		document.body.classList.add('grid');
-		saved=false;
+		g.setAttribute('data-old','0');
+		g.checked=true;
 	}
 }
 
