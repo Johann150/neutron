@@ -25,11 +25,18 @@ var prevX; // the previous x coordinate when drawing
 var prevY; // the previous y coordinate when drawing
 var saved; // boolean, wether the active state has been modified since the last save
 var grid; // boolean, wether the grid is visisble or not
+var height; // current height of the canvas
+var scrolled;
 
 function resize(h){
 	// check that the body isn't already the right size
-	if(parseInt(document.body.style.height)!==h){
-		document.body.style.height=h+"px";
+	if(height<h){
+		height=h;
+		scrolled=getScrollBarMax();
+		// adjust scrollbar styling
+		var scrollStyle=document.getElementById('scroll').style;
+		scrollStyle.height=Math.ceil(document.body.clientHeight/height*100)+"vh";
+		scrollStyle.top=scrolled+"px";
 	}
 }
 
@@ -57,6 +64,9 @@ function setupHandlers(){
 	document.getElementById('stroke').oninput=strokeChange;
 	document.getElementById('down').onclick=down;
 	document.getElementById('quit').onclick=quit;
+	document.getElementById('scroll').onmousedown=scrollStart;
+	document.body.onmousemove=scrollMove;
+	document.body.onmouseup=scrollStop;
 	window.onscroll=repaintAll;
 }
 
@@ -99,12 +109,14 @@ function setup(){
 	prevX=0;
 	prevY=0;
 	saved=true;
+	height=document.documentElement.clientHeight;
+	scrolled=0;
 	colorchooser=document.createElement('input');
 	colorchooser.type="color";
 	// get canvas
 	canvas=document.getElementById("canvas");
 	// initialize canvas and context
-	canvas.width=document.documentElement.clientWidth;
+	canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
 	canvas.height=document.documentElement.clientHeight;
 	// get context
 	context=canvas.getContext("2d");
@@ -268,11 +280,11 @@ function saveImg(){
 }
 
 function down(){
-	if(window.scrollY>=getScrollMaxY()){
-		resize(parseInt(document.body.style.height,10)+100);
+	if(scrolled>=getScrollBarMax()){
+		resize(height+100);
 		saved=false;
 	}
-	window.scrollTo(0,getScrollMaxY());
+	repaintAll();
 }
 
 function undo(){
@@ -332,11 +344,11 @@ function repaintAll(){
 			){
 				// this point is required
 				if(!moved){
-					context.moveTo(point.x,point.y-window.scrollY);
+					context.moveTo(point.x,point.y-scrolled);
 					moved=true;
 				}
 				// always make a line to also draw lines consisting of one point only
-				context.lineTo(point.x,point.y-window.scrollY);
+				context.lineTo(point.x,point.y-scrolled);
 			}
 		}
 		// draw the current path
@@ -774,7 +786,7 @@ function _fileRead(f){
 	saved=true;
 	// make sure everything will be visible
 	for(var i=0;i<image.length;i++){
-		document.body.style.height=Math.max(image[i].points.max(),document.body.style.height);
+		resize(Math.max(image[i].points.max(),height));
 	}
 }
 

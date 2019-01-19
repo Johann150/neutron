@@ -72,3 +72,22 @@ function mouseup(evt){
 	context.stroke();
 	drawing=false;
 }
+
+var scrolling=-1;
+function scrollStart(evt){
+	scrolling=evt.clientY;
+}
+
+function scrollMove(evt){
+	if(scrolling!=-1){
+		var d=scrolling-evt.clientY;
+		scrolled=Math.min(Math.max(scrolled-d,0),getScrollBarMax())
+		document.getElementById('scroll').style.top=scrolled+"px";
+		scrolling=evt.clientY;
+		repaintAll();
+	}
+}
+
+function scrollStop(evt){
+	scrolling=-1;
+}

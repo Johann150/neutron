@@ -1,5 +1,5 @@
-function getScrollMaxY(){
-	return document.documentElement.scrollHeight-document.documentElement.clientHeight;
+function getScrollBarMax(){
+	return Math.floor((height-document.documentElement.clientHeight)/height*document.documentElement.clientHeight);
 }
 
 function rgb2hex(rgb){
