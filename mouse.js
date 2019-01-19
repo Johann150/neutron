@@ -17,27 +17,27 @@ function mousedown(evt){
 	};
 	drawing=true;
 	prevX=evt.clientX-canvas.offsetLeft;
-	prevY=evt.clientY-canvas.offsetTop+window.scrollY;
+	prevY=evt.clientY-canvas.offsetTop+scrolled;
 	activePath.points.push({
 		x:prevX,
 		y:prevY
 	});
 	// draw a single point
-	context.moveTo(prevX,prevY-window.scrollY);
-	context.lineTo(prevX,prevY-window.scrollY);
+	context.moveTo(prevX,prevY-scrolled);
+	context.lineTo(prevX,prevY-scrolled);
 	context.stroke();
 }
 
 function mousemove(evt){
 	if(drawing){
-		context.moveTo(prevX,prevY-window.scrollY);
+		context.moveTo(prevX,prevY-scrolled);
 		prevX=evt.clientX-canvas.offsetLeft;
-		prevY=evt.clientY-canvas.offsetTop+window.scrollY;
+		prevY=evt.clientY-canvas.offsetTop+scrolled;
 		activePath.points.push({
 			x:prevX,
 			y:prevY
 		});
-		context.lineTo(prevX,prevY-window.scrollY);
+		context.lineTo(prevX,prevY-scrolled);
 		context.stroke();
 	}
 	// set erasor cursor
@@ -51,9 +51,9 @@ function mouseup(evt){
 		// this is a real mouse handler call and not a delegation
 		evt.stopPropagation();
 		evt.preventDefault();
-		context.moveTo(prevX,prevY-window.scrollY);
+		context.moveTo(prevX,prevY-scrolled);
 		prevX=evt.clientX-canvas.offsetLeft;
-		prevY=evt.clientY-canvas.offsetTop+window.scrollY;
+		prevY=evt.clientY-canvas.offsetTop+scrolled;
 		activePath.points.push({
 			x:prevX,
 			y:prevY
@@ -68,7 +68,7 @@ function mouseup(evt){
 	redoStack=[];
 	// grey-out the redo button
 	document.getElementById('redo').style.filter="brightness(50%)";
-	context.lineTo(prevX,prevY-window.scrollY);
+	context.lineTo(prevX,prevY-scrolled);
 	context.stroke();
 	drawing=false;
 }
@@ -83,6 +83,7 @@ function scrollMove(evt){
 		var d=scrolling-evt.clientY;
 		scrolled=Math.min(Math.max(scrolled-d,0),getScrollBarMax())
 		document.getElementById('scroll').style.top=scrolled+"px";
+		document.body.style.backgroundPosition=`top ${-scrolled}px left 0`;
 		scrolling=evt.clientY;
 		repaintAll();
 	}

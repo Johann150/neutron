@@ -100,7 +100,7 @@ function setup(){
 	penColor="#ffffff";
 	document.body.style.setProperty("--pen-color",penColor);
 	bgColor="#006633";
-	grid="transparent";
+	grid="#000000";
 	document.body.style.backgroundColour=bgColor;
 	penWidth=2;
 	eraseWidth=50;
@@ -534,15 +534,16 @@ function gridClick(evt){
 		// set colour palette for grid
 		document.getElementById('colour-a').style.backgroundColor="#eaeaea";
 		document.getElementById('colour-b').style.backgroundColor="#4c4c4c";
+		document.getElementById('colour-c').style.backgroundColor="#096";
 
 		// hide unused colours
-		document.getElementById('colour-c').style.display=
 		document.getElementById('colour-d').style.display=
 		document.getElementById('colour-e').style.display=
 		document.getElementById('colour-f').style.display="none";
 
 		document.getElementById('colour-a').onclick=
 		document.getElementById('colour-b').onclick=
+		document.getElementById('colour-c').onclick=
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
@@ -554,7 +555,6 @@ function gridClick(evt){
 		};
 
 		// remove action listener from unused buttons
-		document.getElementById('colour-c').onclick=
 		document.getElementById('colour-d').onclick=
 		document.getElementById('colour-e').onclick=
 		document.getElementById('colour-f').onclick=()=>{};

@@ -121,6 +121,8 @@ canvas{
 	background-image:
 		repeating-linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0) calc(var(--grid-size) - 1px), var(--grid-color) var(--grid-size)),
 		repeating-linear-gradient(to right, rgba(0,0,0,0), rgba(0,0,0,0) calc(var(--grid-size) - 1px), var(--grid-color) var(--grid-size));
+	background-repeat:repeat;
+	background-position:top 0px left 0;
 }
 #scroll{
 	position:relative;
