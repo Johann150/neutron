@@ -24,7 +24,7 @@ var drawing; // boolean, wether the user is drawing at the moment
 var prevX; // the previous x coordinate when drawing
 var prevY; // the previous y coordinate when drawing
 var saved; // boolean, wether the active state has been modified since the last save
-var grid; // boolean, wether the grid is visisble or not
+var gridColor; // the colour last used to draw the grid
 var height; // current height of the canvas
 var scrolled;
 
@@ -546,8 +546,8 @@ function gridClick(evt){
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
-			grid=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
-			document.body.style.setProperty('--grid-color',grid);
+			gridColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
+			document.body.style.setProperty('--grid-color',gridColor);
 			saved=false;
 			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('grid').setAttribute('data-old','2');
@@ -560,10 +560,10 @@ function gridClick(evt){
 		document.getElementById('colour-f').onclick=()=>{};
 
 		document.getElementById('chooser').onclick=()=>{
-			colorchooser.value=rgb2hex(document.body.style.backgroundColor);
+			colorchooser.value=rgb2hex(gridColor);
 			colorchooser.onchange=function(evt){
-				document.body.style.backgroundColor=colorchooser.value;
-				bgColor=colorchooser.value;
+				gridColor=colorchooser.value;
+				document.body.style.setProperty('--grid-color',gridColor);
 				saved=false;
 			};
 			document.getElementById('colours-wrapper').style.display="none";
@@ -596,14 +596,13 @@ function fileSave(closing){
 	var data={
 		image:image,
 		bg:document.body.style.backgroundColor,
-		grid:grid,
 		penWidth:penWidth,
 		penColor:penColor,
 		eraseWidth:eraseWidth,
 		redoStack:redoStack,
 		width:document.body.clientWidth,
 		height:document.body.clientHeight,
-		grid:(document.body.classList.contains('grid')?grid:'transparent')
+		gridColor:(document.body.classList.contains('grid')?gridColor:'transparent')
 	};
 	if(filePath===undefined){
 		var date=new Date();
@@ -783,6 +782,8 @@ function _fileRead(f){
 	context.strokeStyle=penColor;
 	document.body.style.setProperty("--pen-color",penColor);
 	eraseWidth=data.eraseWidth;
+	gridColor=data.gridColor;
+	document.body.style.setProperty("--grid-color",gridColor);
 	saved=true;
 	// make sure everything will be visible
 	for(var i=0;i<image.length;i++){
