@@ -12,11 +12,18 @@ var drawing; // boolean, wether the user is drawing at the moment
 var prevX; // the previous x coordinate when drawing
 var prevY; // the previous y coordinate when drawing
 var grid; // boolean, wether the grid is visisble or not
+var height; // current height of the canvas
+var scrolled;
 
 function resize(h){
 	// check that the body isn't already the right size
-	if(parseInt(document.body.style.height)!==h){
-		document.body.style.height=h+"px";
+	if(height<h){
+		height=h;
+		scrolled=getScrollBarMax();
+		// adjust scrollbar styling
+		var scrollStyle=document.getElementById('scroll').style;
+		scrollStyle.height=Math.ceil(document.body.clientHeight/height*100)+"vh";
+		scrollStyle.top=scrolled+"px";
 	}
 }
 
@@ -30,6 +37,9 @@ function setupHandlers(){
 	document.getElementById('redo').onclick=redo;
 	document.getElementById('stroke').oninput=strokeChange;
 	document.getElementById('down').onclick=down;
+	document.getElementById('scroll').onmousedown=scrollStart;
+	document.body.onmousemove=scrollMove;
+	document.body.onmouseup=scrollStop;
 	window.onscroll=repaintAll;
 }
 
@@ -45,7 +55,7 @@ function setup(){
 	penColor="#ffffff";
 	document.body.style.setProperty("--pen-color",penColor);
 	bgColor="#006633";
-	grid="#000000";
+	grid="transparent";
 	document.body.style.backgroundColour=bgColor;
 	penWidth=2;
 	eraseWidth=50;
@@ -53,12 +63,14 @@ function setup(){
 	drawing=false;
 	prevX=0;
 	prevY=0;
+	height=document.documentElement.clientHeight;
+	scrolled=0;
 	colorchooser=document.createElement('input');
 	colorchooser.type="color";
 	// get canvas
 	canvas=document.getElementById("canvas");
 	// initialize canvas and context
-	canvas.width=document.documentElement.clientWidth;
+	canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
 	canvas.height=document.documentElement.clientHeight;
 	// get context
 	context=canvas.getContext("2d");
@@ -136,7 +148,7 @@ function saveImg(){
 			}
 		]
 	};
-		dialog.showSaveDialog(options,(f)=>{
+	dialog.showSaveDialog(options,(f)=>{
 		if(f===undefined){
 			return; // canceled
 		}
@@ -200,10 +212,10 @@ function saveImg(){
 }
 
 function down(){
-	if(window.scrollY>=getScrollMaxY()){
-		resize(parseInt(document.body.style.height,10)+100);
+	if(scrolled>=getScrollBarMax()){
+		resize(height+100);
 	}
-	window.scrollTo(0,getScrollMaxY());
+	repaintAll();
 }
 
 function undo(){
@@ -261,91 +273,16 @@ function repaintAll(){
 			){
 				// this point is required
 				if(!moved){
-					context.moveTo(point.x,point.y-window.scrollY);
+					context.moveTo(point.x,point.y-scrolled);
 					moved=true;
 				}
 				// always make a line to also draw lines consisting of one point only
-				context.lineTo(point.x,point.y-window.scrollY);
+				context.lineTo(point.x,point.y-scrolled);
 			}
 		}
 		// draw the current path
 		context.stroke();
 	}
-}
-
-function mousedown(evt){
-	context.beginPath();
-	if(document.getElementById("erase").checked){
-		context.globalCompositeOperation="destination-out";
-		context.strokeStyle="rgba(0,0,0,1)";
-		context.lineWidth=eraseWidth;
-	}else{
-		context.globalCompositeOperation="source-over";
-		context.strokeStyle=penColor;
-		context.lineWidth=penWidth;
-	}
-	activePath={
-		color:context.strokeStyle,
-		gco:context.globalCompositeOperation,
-		width:context.lineWidth,
-		points:[]
-	};
-	drawing=true;
-	prevX=evt.clientX-canvas.offsetLeft;
-	prevY=evt.clientY-canvas.offsetTop+window.scrollY;
-	activePath.points.push({
-		x:prevX,
-		y:prevY
-	});
-	// draw a single point
-	context.moveTo(prevX,prevY-window.scrollY);
-	context.lineTo(prevX,prevY-window.scrollY);
-	context.stroke();
-}
-
-function mousemove(evt){
-	if(drawing){
-		context.moveTo(prevX,prevY-window.scrollY);
-		prevX=evt.clientX-canvas.offsetLeft;
-		prevY=evt.clientY-canvas.offsetTop+window.scrollY;
-		activePath.points.push({
-			x:prevX,
-			y:prevY
-		});
-		context.lineTo(prevX,prevY-window.scrollY);
-		context.stroke();
-	}
-	// set erasor cursor
-	var style=document.body.style;
-	style.setProperty("--erase-x",evt.clientX+"px");
-	style.setProperty("--erase-y",evt.clientY+"px");
-}
-
-function mouseup(evt){
-	if(typeof evt!=='undefined'&&activePath!=null){
-		// this is a real mouse handler call and not a delegation
-		evt.stopPropagation();
-		evt.preventDefault();
-		context.moveTo(prevX,prevY-window.scrollY);
-		prevX=evt.clientX-canvas.offsetLeft;
-		prevY=evt.clientY-canvas.offsetTop+window.scrollY;
-		activePath.points.push({
-			x:prevX,
-			y:prevY
-		});
-	}
-	// save what was drawn
-	image.push(activePath);
-	saved=false;
-	// display undo button as normal
-	document.getElementById('undo').style.filter="";
-	// user drew sth new so empty redoStack
-	redoStack=[];
-	// grey-out the redo button
-	document.getElementById('redo').style.filter="brightness(50%)";
-	context.lineTo(prevX,prevY-window.scrollY);
-	context.stroke();
-	drawing=false;
 }
 
 function penClick(){
@@ -574,23 +511,6 @@ function gridClick(evt){
 		g.setAttribute('data-old','0');
 		g.checked=true;
 	}
-}
-
-function getScrollMaxY(){
-	return document.documentElement.scrollHeight-document.documentElement.clientHeight;
-}
-
-function rgb2hex(rgb){
-	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
-	return (rgb && rgb.length === 4) ? "#" +
-		("0" + parseInt(rgb[1],10).toString(16)).slice(-2) +
-		("0" + parseInt(rgb[2],10).toString(16)).slice(-2) +
-		("0" + parseInt(rgb[3],10).toString(16)).slice(-2) : rgb;
-}
-
-function pointInViewport(point){
-	// x does not need to be checked
-	return (window.scrollY<=point.y&&point.y<window.scrollY+document.documentElement.clientHeight);
 }
 
 // start neutron
