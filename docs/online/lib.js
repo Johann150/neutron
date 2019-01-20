@@ -12,7 +12,7 @@ function rgb2hex(rgb){
 
 function pointInViewport(point){
 	// x does not need to be checked
-	return (window.scrollY<=point.y&&point.y<window.scrollY+document.documentElement.clientHeight);
+	return (scrolled<=point.y&&point.y<scrolled+document.documentElement.clientHeight);
 }
 
 Array.prototype.max = function() {

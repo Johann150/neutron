@@ -47,6 +47,7 @@ function mousemove(evt){
 }
 
 function mouseup(evt){
+	if(drawing!==true) return;
 	if(typeof evt!=='undefined'&&activePath!=null){
 		// this is a real mouse handler call and not a delegation
 		context.moveTo(prevX,prevY-scrolled);
