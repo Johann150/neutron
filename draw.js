@@ -32,11 +32,8 @@ function resize(h){
 	// check that the body isn't already the right size
 	if(height<h){
 		height=h;
-		scrolled=getScrollBarMax();
 		// adjust scrollbar styling
-		var scrollStyle=document.getElementById('scroll').style;
-		scrollStyle.height=Math.ceil(document.body.clientHeight/height*100)+"vh";
-		scrollStyle.top=scrolled+"px";
+		document.getElementById('scroll').style.height=(document.body.clientHeight-getScrollBarMax())+"px";
 	}
 }
 
@@ -284,6 +281,9 @@ function down(){
 		resize(height+100);
 		saved=false;
 	}
+	scrolled=getScrollBarMax();
+	document.getElementById('scroll').style.top=scrolled+"px";
+	document.body.style.backgroundPosition=`top ${-scrolled}px left 0`;
 	repaintAll();
 }
 
