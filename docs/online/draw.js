@@ -129,82 +129,60 @@ only saves background colour and what was written
 background images will be ignored
 */
 function saveImg(){
+	var Ecanvas=document.createElement('canvas');
+	Ecanvas.width=canvas.width;
+	Ecanvas.height=height;
+	var Ectx=Ecanvas.getContext('2d');
+	// repaint for png download
+	for(var i=0;i<image.length;i++){
+		var path=image[i];
+		if(path==null) continue;
+		Ectx.strokeStyle=path.color;
+		Ectx.lineWidth=path.width+1;
+		Ectx.globalCompositeOperation=path.gco;
+		Ectx.beginPath();
+		Ectx.moveTo(path.points[0].x,path.points[0].y);
+		for(var j=1;j<path.points.length;j++){
+			Ectx.lineTo(path.points[j].x,path.points[j].y);
+		}
+		Ectx.stroke();
+	}
+	// draw grid if switched on
+	if(document.body.classList.contains('grid')){
+		var gridSize=document.documentElement.clientHeight*parseInt(getComputedStyle(document.body).getPropertyValue('--grid-size'))/100;
+		Ectx.strokeStyle=grid;
+		Ectx.lineWidth=1;
+		for(var y=0;y<height;y+=gridSize){
+			Ectx.beginPath();
+			Ectx.moveTo(0,y);
+			Ectx.lineTo(canvas.width,y);
+			Ectx.stroke();
+		}
+		for(var x=0;x<canvas.width;x+=gridSize){
+			Ectx.strokeStyle=grid;
+			Ectx.beginPath();
+			Ectx.moveTo(x,0);
+			Ectx.lineTo(x,height);
+			Ectx.stroke();
+		}
+	}
+	// paint background
+	Ectx.globalCompositeOperation='destination-over';
+	Ectx.fillStyle=bgColor;
+	Ectx.fillRect(0,0,Ecanvas.width,Ecanvas.height);
+	// make browser download the file
 	var date=new Date();
-	let options={
-		title:'Als Bild speichern',
-		buttonLabel:'Speichern',
-		defaultPath:date.getFullYear()+'-'+(date.getMonth()+1)+'-'+date.getDate(),
-		filters:[
-			{
-				name:'PNG-Bild',
-				extensions:['png']
-			},
-			{
-				name:'JPEG-Bild',
-				extensions:['jpg','jpeg']
-			}
-		]
-	};
-	dialog.showSaveDialog(options,(f)=>{
-		if(f===undefined){
-			return; // canceled
-		}
-		var canv,ctx;
-		canv=document.createElement('canvas');
-		canv.width=document.body.clientWidth;
-		canv.height=document.body.clientHeight;
-		ctx=canv.getContext('2d');
-		// clear image
-		ctx.clearRect(0,0,canv.width,canv.height);
-		// paint all paths
-		for(var i=0;i<image.length;i++){
-			ctx.beginPath();
-			var path=image[i];
-			if(path==null){
-				continue;
-			}
-			// set appearance
-			ctx.strokeStyle=path.color;
-			ctx.lineWidth=path.width+1;
-			ctx.globalCompositeOperation=path.gco;
-			// add all points
-			var point=path.points[0];
-			ctx.moveTo(point.x,point.y);
-			// start at 0 again to also draw single points
-			for(var j=0;j<path.points.length;j++){
-				point=path.points[j];
-				ctx.lineTo(point.x,point.y);
-			}
-			// draw!
-			ctx.stroke();
-		}
-		// add the background
-		ctx.globalCompositeOperation='destination-over';
-		ctx.fillStyle=bgColor;
-		ctx.fillRect(0,0,canv.width,canv.height);
-		// save image
-		var data;
-		if(f.match(/\.png$/i)!==null){
-			// get png data
-			data=canv.toDataURL('image/png');
-		}else if(f.match(/\.jpe?g$/i)!==null){
-			// get jpg data
-			data=canv.toDataURL('image/jpeg');
-		}
-		var img=nativeImage.createFromDataURL(data);
-		if(f.match(/\.png$/i)!==null){
-			// get png data
-			data=img.toPNG();
-		}else if(f.match(/\.jpe?g$/i)!==null){
-			// get jpg data
-			data=img.toJPEG(1);
-		}
-		fs.writeFile(f,data,(err)=>{
-			if(err){
-				alert("Beim Speichern ist ein Fehler aufgetreten: "+err.message);
-				console.error("saving error:"+err.message);
-			}
-		});
+	var filename=date.getDate()+"-"+(date.getMonth()+1)+"-"+date.getFullYear()+".png";
+	Ecanvas.toBlob((blob)=>{
+		var url=window.URL.createObjectURL(blob);
+		var anchor=document.createElement('a');
+		document.body.appendChild(anchor);
+		anchor.style.display="none";
+		anchor.href=url;
+		anchor.download=filename;
+		anchor.click();
+		window.URL.revokeObjectURL(url);
+		anchor.remove();
 	});
 }
 
