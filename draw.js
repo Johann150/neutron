@@ -285,6 +285,9 @@ function saveImg(){
 }
 
 function down(){
+	if(height<document.documentElement.clientHeight){
+		height=document.documentElement.clientHeight;
+	}
 	if(scrolled>=getScrollBarMax()){
 		resize(height+100);
 		saved=false;
