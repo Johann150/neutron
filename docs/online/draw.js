@@ -13,7 +13,7 @@ var prevX; // the previous x coordinate when drawing
 var prevY; // the previous y coordinate when drawing
 var grid; // boolean, wether the grid is visisble or not
 var height; // current height of the canvas
-var scrolled;
+var scrolled; // how far the page is currently scolled
 
 function resize(h){
 	// check that the body isn't already the right size
@@ -148,6 +148,7 @@ function saveImg(){
 		Ectx.stroke();
 	}
 	// draw grid if switched on
+	Ectx.globalCompositeOperation='destination-over';
 	if(document.body.classList.contains('grid')){
 		var gridSize=document.documentElement.clientHeight*parseInt(getComputedStyle(document.body).getPropertyValue('--grid-size'))/100;
 		Ectx.strokeStyle=grid;
@@ -167,7 +168,6 @@ function saveImg(){
 		}
 	}
 	// paint background
-	Ectx.globalCompositeOperation='destination-over';
 	Ectx.fillStyle=bgColor;
 	Ectx.fillRect(0,0,Ecanvas.width,Ecanvas.height);
 	// make browser download the file
