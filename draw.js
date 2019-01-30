@@ -26,14 +26,14 @@ var prevY; // the previous y coordinate when drawing
 var saved; // boolean, wether the active state has been modified since the last save
 var gridColor; // the colour last used to draw the grid
 var height; // current height of the canvas
-var scrolled;
+var scrolled; // how far the page is currently scolled
 
 function resize(h){
 	// check that the body isn't already the right size
 	if(height<h){
 		height=h;
 		// adjust scrollbar styling
-		document.getElementById('scroll').style.height=(document.body.clientHeight-getScrollBarMax())+"px";
+		document.getElementById('scroll').style.height=(Math.pow(document.documentElement.clientHeight,2)/height)+"px"
 	}
 }
 
@@ -293,7 +293,7 @@ function down(){
 		saved=false;
 	}
 	scrolled=getScrollBarMax();
-	document.getElementById('scroll').style.top=scrolled+"px";
+	document.getElementById('scroll').style.top=(scrolled*document.documentElement.clientHeight/height)+"px";
 	document.body.style.backgroundPosition=`top ${-scrolled}px left 0`;
 	repaintAll();
 }
