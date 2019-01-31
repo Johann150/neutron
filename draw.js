@@ -61,14 +61,65 @@ function setupHandlers(){
 	document.getElementById('stroke').oninput=strokeChange;
 	document.getElementById('down').onclick=down;
 	document.getElementById('quit').onclick=quit;
+	window.onscroll=repaintAll;
+
+	document.onmouseout=document.onmouseup=()=>{
+		if(drawing){
+			mouseup();
+		}else if(scrolling!=-1){
+			scrollStop();
+		}
+	};
+	// handlers for the scrollbar
+	// mouse handlers
 	document.getElementById('scroll').onmousedown=scrollStart;
 	document.body.onmousemove=scrollMove;
 	document.body.onmouseup=scrollStop;
-	window.onscroll=repaintAll;
+	document.getElementById('scroll').ontouchstart=(evt)=>{
+		scrollStart(evt.touches[0]);
+	};
+	document.body.ontouchmove=(evt)=>{
+		scrollMove(evt.touches[0]);
+	};
+	document.body.ontouchend=scrollStop;
+	document.body.ontouchcancel=document.onmouseup;
+	// handlers for the canvas
+	// mouse handlers
+	canvas.onmousedown=mousedown;
+	canvas.onmousemove=mousemove;
+	canvas.onmouseup=mouseup;
+	// touch handlers
+	canvas.ontouchstart=(evt)=>{
+		canvas.onmousedown(evt.touches[0]);
+	};
+	canvas.ontouchmove=(evt)=>{
+		canvas.onmousemove(evt.touches[0]);
+	};
+	canvas.ontouchend=()=>{
+		canvas.onmouseup();
+	};
+	canvas.ontouchcancel=document.onmouseup;
+	// make sure canvas gets resized if window dimension changes
+	// but never reduce the canvas size
+	document.body.onresize=()=>{
+		if(canvas.width+20!==document.documentElement.clientWidth){
+			canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
+			canvas.height=document.documentElement.clientHeight;
+			// get context
+			context=canvas.getContext("2d");
+			// setup context
+			// this enhances line drawing so there are no sudden gaps in the line
+			context.lineJoin="round";
+			context.lineCap="round";
+			context.lineWidth=penWidth;
+			repaintAll();
+		}else{
+			resize(Math.max(canvas.height,document.body.clientHeight));
+		}
+	};
 }
 
 function setup(){
-	setupHandlers();
 	// grey-out undo and redo buttons
 	document.getElementById('undo').style.filter="brightness(50%)";
 	document.getElementById('redo').style.filter="brightness(50%)";
@@ -124,50 +175,7 @@ function setup(){
 	resize(document.documentElement.clientHeight);
 	context.lineWidth=penWidth;
 	context.clearRect(0,0,canvas.width,canvas.height);
-	// make sure canvas gets resized if window dimension changes
-	// but never reduce the canvas size
-	document.body.onresize=function(){
-		if(canvas.width!==document.documentElement.clientWidth){
-			canvas.width=document.documentElement.clientWidth;
-			canvas.height=document.documentElement.clientHeight;
-			// get context
-			context=canvas.getContext("2d");
-			// setup context
-			// this enhances line drawing so there are no sudden gaps in the line
-			context.lineJoin="round";
-			context.lineCap="round";
-			context.lineWidth=penWidth;
-			repaintAll();
-		}else{
-			resize(Math.max(canvas.height,document.body.clientHeight));
-		}
-	};
-	// mouse handlers
-	canvas.onmousedown=mousedown;
-	canvas.onmousemove=mousemove;
-	canvas.onmouseup=mouseup;
-	document.onmouseup=function(){
-		if(drawing){
-			mouseup();
-		}
-	};
-	// touch handlers
-	canvas.ontouchstart=function(evt){
-		evt.preventDefault();
-		evt.stopPropagation();
-		canvas.onmousedown(evt.touches[0]);
-	};
-	canvas.ontouchmove=function(evt){
-		evt.preventDefault();
-		evt.stopPropagation();
-		canvas.onmousemove(evt.touches[0]);
-	};
-	canvas.ontouchend=function(evt){
-		evt.preventDefault();
-		evt.stopPropagation();
-		canvas.onmouseup();
-	};
-	canvas.ontouchcancel=document.onmouseup;
+	setupHandlers();
 	// key handlers
 	document.onkeyup=function(evt){
 		if(evt.keyCode==27){

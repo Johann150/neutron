@@ -89,6 +89,6 @@ function scrollMove(evt){
 	}
 }
 
-function scrollStop(evt){
+function scrollStop(){
 	scrolling=-1;
 }
