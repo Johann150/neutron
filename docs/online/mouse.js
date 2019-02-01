@@ -80,14 +80,14 @@ function scrollStart(evt){
 function scrollMove(evt){
 	if(scrolling!=-1){
 		var d=scrolling-evt.clientY;
-		scrolled=Math.min(Math.max(scrolled-d,0),getScrollBarMax())
-		document.getElementById('scroll').style.top=scrolled+"px";
+		scrolled=Math.min(Math.max(scrolled-(d*height/document.documentElement.clientHeight),0),getScrollBarMax())
+		document.getElementById('scroll').style.top=(scrolled*document.documentElement.clientHeight/height)+"px";
 		document.body.style.backgroundPosition=`top ${-scrolled}px left 0`;
 		scrolling=evt.clientY;
 		repaintAll();
 	}
 }
 
-function scrollStop(evt){
+function scrollStop(){
 	scrolling=-1;
 }

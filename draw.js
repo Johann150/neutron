@@ -26,7 +26,7 @@ var prevY; // the previous y coordinate when drawing
 var saved; // boolean, wether the active state has been modified since the last save
 var gridColor; // the colour last used to draw the grid
 var height; // current height of the canvas
-var scrolled; // how far the page is currently scolled
+var scrolled; // how far the page is currently scrolled
 
 function resize(h){
 	// check that the body isn't already the right size

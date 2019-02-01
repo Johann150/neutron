@@ -13,14 +13,14 @@ var prevX; // the previous x coordinate when drawing
 var prevY; // the previous y coordinate when drawing
 var grid; // boolean, wether the grid is visisble or not
 var height; // current height of the canvas
-var scrolled; // how far the page is currently scolled
+var scrolled; // how far the page is currently scrolled
 
 function resize(h){
 	// check that the body isn't already the right size
 	if(height<h){
 		height=h;
 		// adjust scrollbar styling
-		document.getElementById('scroll').style.height=(document.body.clientHeight-getScrollBarMax())+"px";
+		document.getElementById('scroll').style.height=(Math.pow(document.documentElement.clientHeight,2)/height)+"px"
 	}
 }
 
@@ -30,18 +30,72 @@ function setupHandlers(){
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
 	document.querySelector('label[for=grid]').onclick=gridClick;
 	document.getElementById('save-img').onclick=saveImg;
+	document.getElementById('save').onclick=fileSave;
+	document.getElementById('open').onclick=fileOpen;
 	document.getElementById('undo').onclick=undo;
 	document.getElementById('redo').onclick=redo;
 	document.getElementById('stroke').oninput=strokeChange;
 	document.getElementById('down').onclick=down;
+	document.getElementById('quit').onclick=quit;
+	window.onscroll=repaintAll;
+
+	document.onmouseout=document.onmouseup=()=>{
+		if(drawing){
+			mouseup();
+		}else if(scrolling!=-1){
+			scrollStop();
+		}
+	};
+	// handlers for the scrollbar
+	// mouse handlers
 	document.getElementById('scroll').onmousedown=scrollStart;
 	document.body.onmousemove=scrollMove;
 	document.body.onmouseup=scrollStop;
-	window.onscroll=repaintAll;
+	document.getElementById('scroll').ontouchstart=(evt)=>{
+		scrollStart(evt.touches[0]);
+	};
+	document.body.ontouchmove=(evt)=>{
+		scrollMove(evt.touches[0]);
+	};
+	document.body.ontouchend=scrollStop;
+	document.body.ontouchcancel=document.onmouseup;
+	// handlers for the canvas
+	// mouse handlers
+	canvas.onmousedown=mousedown;
+	canvas.onmousemove=mousemove;
+	canvas.onmouseup=mouseup;
+	// touch handlers
+	canvas.ontouchstart=(evt)=>{
+		canvas.onmousedown(evt.touches[0]);
+	};
+	canvas.ontouchmove=(evt)=>{
+		canvas.onmousemove(evt.touches[0]);
+	};
+	canvas.ontouchend=()=>{
+		canvas.onmouseup();
+	};
+	canvas.ontouchcancel=document.onmouseup;
+	// make sure canvas gets resized if window dimension changes
+	// but never reduce the canvas size
+	document.body.onresize=()=>{
+		if(canvas.width+20!==document.documentElement.clientWidth){
+			canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
+			canvas.height=document.documentElement.clientHeight;
+			// get context
+			context=canvas.getContext("2d");
+			// setup context
+			// this enhances line drawing so there are no sudden gaps in the line
+			context.lineJoin="round";
+			context.lineCap="round";
+			context.lineWidth=penWidth;
+			repaintAll();
+		}else{
+			resize(Math.max(canvas.height,document.body.clientHeight));
+		}
+	};
 }
 
 function setup(){
-	setupHandlers();
 	// grey-out undo and redo buttons
 	document.getElementById('undo').style.filter="brightness(50%)";
 	document.getElementById('redo').style.filter="brightness(50%)";
@@ -78,50 +132,7 @@ function setup(){
 	resize(document.documentElement.clientHeight);
 	context.lineWidth=penWidth;
 	context.clearRect(0,0,canvas.width,canvas.height);
-	// make sure canvas gets resized if window dimension changes
-	// but never reduce the canvas size
-	document.body.onresize=function(){
-		if(canvas.width!==document.documentElement.clientWidth){
-			canvas.width=document.documentElement.clientWidth;
-			canvas.height=document.documentElement.clientHeight;
-			// get context
-			context=canvas.getContext("2d");
-			// setup context
-			// this enhances line drawing so there are no sudden gaps in the line
-			context.lineJoin="round";
-			context.lineCap="round";
-			context.lineWidth=penWidth;
-			repaintAll();
-		}else{
-			resize(Math.max(canvas.height,document.body.clientHeight));
-		}
-	};
-	// mouse handlers
-	canvas.onmousedown=mousedown;
-	canvas.onmousemove=mousemove;
-	canvas.onmouseup=mouseup;
-	document.onmouseup=function(){
-		if(drawing){
-			mouseup();
-		}
-	};
-	// touch handlers
-	canvas.ontouchstart=function(evt){
-		evt.preventDefault();
-		evt.stopPropagation();
-		canvas.onmousedown(evt.touches[0]);
-	};
-	canvas.ontouchmove=function(evt){
-		evt.preventDefault();
-		evt.stopPropagation();
-		canvas.onmousemove(evt.touches[0]);
-	};
-	canvas.ontouchend=function(evt){
-		evt.preventDefault();
-		evt.stopPropagation();
-		canvas.onmouseup();
-	};
-	canvas.ontouchcancel=document.onmouseup;
+	setupHandlers();
 }
 
 /*
@@ -187,11 +198,14 @@ function saveImg(){
 }
 
 function down(){
+	if(height<document.documentElement.clientHeight){
+		height=document.documentElement.clientHeight;
+	}
 	if(scrolled>=getScrollBarMax()){
 		resize(height+100);
 	}
 	scrolled=getScrollBarMax();
-	document.getElementById('scroll').style.top=scrolled+"px";
+	document.getElementById('scroll').style.top=(scrolled*document.documentElement.clientHeight/height)+"px";
 	document.body.style.backgroundPosition=`top ${-scrolled}px left 0`;
 	repaintAll();
 }
