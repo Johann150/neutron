@@ -6,6 +6,9 @@ const url=require('url');
 const {remote,nativeImage}=require('electron');
 const {dialog}=require('electron').remote;
 
+// prevent pinch zooming
+require('electron').webFrame.setZoomLevelLimits(1, 1)
+
 var filePath; // file path to use for saving
 
 // main page javascript
