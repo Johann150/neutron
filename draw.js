@@ -736,11 +736,12 @@ function fileRead(f){
 					// save
 					fileSave();
 					filePath=f;
-					_fileRead(f);
+					_fileRead(JSON.parse(fs.readFileSync(f)));
 					break;
 				case 1:
 					// discard changes
-					_fileRead(f);
+					filePath=f;
+					_fileRead(JSON.parse(fs.readFileSync(f)));
 					break;
 				case 3:
 					// cancel so do nothing
@@ -748,15 +749,14 @@ function fileRead(f){
 			}
 		});
 	}else{
-		_fileRead(f);
+		_fileRead(JSON.parse(fs.readFileSync(f)));
 	}
 }
 
-function _fileRead(f){
+function _fileRead(data){
 	// reset everything
 	setup();
 	// load data
-	var data=JSON.parse(fs.readFileSync(f));
 	bgColor=rgb2hex(data.bg);
 	if(data.image==null){
 		image=[];
