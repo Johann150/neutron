@@ -11,6 +11,7 @@ var colorchooser; // DOM element: <input type="color">
 var drawing; // boolean, wether the user is drawing at the moment
 var prevX; // the previous x coordinate when drawing
 var prevY; // the previous y coordinate when drawing
+var saved; // boolean, wether the active state has been modified since the last save
 var grid; // boolean, wether the grid is visisble or not
 var height; // current height of the canvas
 var scrolled; // how far the page is currently scrolled
@@ -113,6 +114,7 @@ function setup(){
 	drawing=false;
 	prevX=0;
 	prevY=0;
+	saved=false;
 	height=document.documentElement.clientHeight;
 	scrolled=0;
 	colorchooser=document.createElement('input');
