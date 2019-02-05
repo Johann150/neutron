@@ -54,12 +54,19 @@ function setupHandlers(){
 	document.getElementById('down').onclick=down;
 	document.getElementById('quit').onclick=quit;
 	window.onscroll=repaintAll;
-
-	document.onmouseout=document.onmouseup=()=>{
+	// check when to stop scrolling and/or drawing
+	var end=()=>{
 		if(drawing){
 			mouseup();
 		}else if(scrolling!=-1){
 			scrollStop();
+		}
+	};
+	document.onmouseup=canvas.ontouchcancel=end;
+	document.onmouseout=(evt)=>{
+		if(evt.target===window||evt.target===document.documentElement||evt.target===document){
+			// don't do anything if, e.g. the user is hovering over the toolbar or scrollbar while drawing
+			end();
 		}
 	};
 	// handlers for the scrollbar
@@ -90,7 +97,6 @@ function setupHandlers(){
 	canvas.ontouchend=()=>{
 		canvas.onmouseup();
 	};
-	canvas.ontouchcancel=document.onmouseup;
 	// make sure canvas gets resized if window dimension changes
 	// but never reduce the canvas size
 	document.body.onresize=()=>{
