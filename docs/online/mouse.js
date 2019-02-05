@@ -9,7 +9,7 @@ function mousedown(evt){
 		context.strokeStyle=penColor;
 		context.lineWidth=penWidth;
 	}
-	if(drawing&&activePath!=null){
+	if(drawing&&activePath!==null){
 		// something went wrong; save it anyway
 		image.push(activePath);
 	}
