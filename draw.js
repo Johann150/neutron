@@ -46,7 +46,7 @@ function setupHandlers(){
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
 	document.querySelector('label[for=grid]').onclick=gridClick;
 	document.getElementById('save-img').onclick=saveImg;
-	document.getElementById('save').onclick=fileSave;
+	document.getElementById('save').onclick=()=>{fileSave(false)};
 	document.getElementById('open').onclick=fileOpen;
 	document.getElementById('undo').onclick=undo;
 	document.getElementById('redo').onclick=redo;
@@ -175,7 +175,7 @@ function setup(){
 			quit();
 		}else if(evt.keyCode==83&&evt.ctrlKey){
 			// Ctrl+S
-			fileSave();
+			fileSave(false);
 		}else if(evt.keyCode==79&&evt.ctrlKey){
 			// Ctrl+O
 			fileOpen();
@@ -603,7 +603,6 @@ function gridClick(evt){
 }
 
 function fileSave(closing){
-	var closing=(typeof closing!=='undefined')?closing:false;
 	var data={
 		image:image,
 		bg:document.body.style.backgroundColor,
@@ -734,7 +733,7 @@ function fileRead(f){
 			switch(btnCode){
 				case 0:
 					// save
-					fileSave();
+					fileSave(false);
 					filePath=f;
 					_fileRead(JSON.parse(fs.readFileSync(f)));
 					break;

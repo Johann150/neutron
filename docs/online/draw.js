@@ -31,7 +31,7 @@ function setupHandlers(){
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
 	document.querySelector('label[for=grid]').onclick=gridClick;
 	document.getElementById('save-img').onclick=saveImg;
-	// document.getElementById('save').onclick=fileSave;
+	// document.getElementById('save').onclick=()=>{fileSave(false)};
 	// document.getElementById('open').onclick=fileOpen;
 	document.getElementById('undo').onclick=undo;
 	document.getElementById('redo').onclick=redo;
