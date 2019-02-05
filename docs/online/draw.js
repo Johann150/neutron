@@ -83,21 +83,17 @@ function setupHandlers(){
 	};
 	// make sure canvas gets resized if window dimension changes
 	// but never reduce the canvas size
-	document.body.onresize=()=>{
-		if(canvas.width+20!==document.documentElement.clientWidth){
-			canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
-			canvas.height=document.documentElement.clientHeight;
-			// get context
-			context=canvas.getContext("2d");
-			// setup context
-			// this enhances line drawing so there are no sudden gaps in the line
-			context.lineJoin="round";
-			context.lineCap="round";
-			context.lineWidth=penWidth;
-			repaintAll();
-		}else{
-			resize(Math.max(canvas.height,document.body.clientHeight));
-		}
+	window.onresize=()=>{
+		canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
+		canvas.height=document.documentElement.clientHeight;
+		// get context
+		context=canvas.getContext("2d");
+		// setup context
+		// this enhances line drawing so there are no sudden gaps in the line
+		context.lineJoin="round";
+		context.lineCap="round";
+		context.lineWidth=penWidth;
+		repaintAll();
 	};
 }
 
