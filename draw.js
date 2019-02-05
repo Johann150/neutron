@@ -40,17 +40,6 @@ function resize(h){
 	}
 }
 
-function checkTemplateFile(){
-	var f=path.join(process.cwd(),'template.nbrd');
-	fs.stat(f,(err,stat)=>{
-		if(err==null){
-			// file exists
-			console.log("opening template file");
-			_fileRead(f);
-		}
-	});
-}
-
 function setupHandlers(){
 	document.querySelector('label[for=pen]').onclick=penClick;
 	document.querySelector('label[for=erase]').onclick=eraseClick;
