@@ -18,6 +18,34 @@ function fileOpen(){
 	file.click();
 }
 
+function fileSave(){
+	var data={
+		image:image,
+		bg:document.body.style.backgroundColor,
+		penWidth:penWidth,
+		penColor:penColor,
+		eraseWidth:eraseWidth,
+		redoStack:redoStack,
+		width:document.body.clientWidth,
+		height:height,
+		gridColor:(document.body.classList.contains('grid')?gridColor:'transparent')
+	};
+	// make browser download the file
+	var date=new Date();
+	var filename=date.getDate()+"-"+(date.getMonth()+1)+"-"+date.getFullYear()+".png";
+	var blob=new Blob([JSON.stringify(data)],{type:'application/json'});
+	var url=window.URL.createObjectURL(blob);
+	var anchor=document.createElement('a');
+	document.body.appendChild(anchor);
+	anchor.style.display="none";
+	anchor.href=url;
+	anchor.download=filename;
+	anchor.click();
+	window.URL.revokeObjectURL(url);
+	anchor.remove();
+	saved=true;
+}
+
 function _fileRead(data){
 	// reset everything
 	setup();
