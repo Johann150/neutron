@@ -18,11 +18,11 @@ function pointInViewport(point){
 function toggleFullscreen() {
 	if(!document.fullscreenElement){
 		document.documentElement.requestFullscreen();
-		document.getElementById('fullscreen').src="fullscreen-on.svg";
+		document.getElementById('fullscreen').src="fullscreen-off.svg";
 	}else{
 		if(document.exitFullscreen){
-			document.getElementById('fullscreen').src="fullscreen-off.svg";
 			document.exitFullscreen();
+			document.getElementById('fullscreen').src="fullscreen-on.svg";
 		}
 	}
 }
