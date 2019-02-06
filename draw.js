@@ -3,11 +3,11 @@
 const fs=require('fs');
 const path=require('path');
 const url=require('url');
-const {remote,nativeImage}=require('electron');
+const {remote,nativeImage,webFrame}=require('electron');
 const {dialog}=require('electron').remote;
 
 // prevent pinch zooming
-require('electron').webFrame.setZoomLevelLimits(1, 1)
+webFrame.setVisualZoomLevelLimits(1, 1);
 
 var filePath; // file path to use for saving
 
@@ -186,12 +186,6 @@ function setup(){
 			remote.getCurrentWebContents().toggleDevTools();
 		}
 	};
-	// look for default template file
-	if(checkTemplateFile){
-		// this should only happen on startup
-		checkTemplateFile();
-		checkTemplateFile=false;
-	}
 }
 
 /*
