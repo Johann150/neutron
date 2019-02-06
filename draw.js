@@ -762,13 +762,14 @@ function _fileRead(data){
 	}
 	if(data.width!=canvas.width){
 		// adjust for different screen size
-		var imgScale=canvas.width/data.width;
-		for(var obj in image){
-			for(var pt in obj.points){
-				pt.x*=imgScale;
-				pt.y*=imgScale;
-			}
-		}
+		var imgScale=document.documentElement.clientWidth/data.width;
+		image=image.map((obj)=>{
+			obj.points=obj.points.map((pt)=>{
+				pt.x*=imgScale;pt.y*=imgScale;
+				return pt;
+			});
+			return obj;
+		});
 		resize(Math.max(data.height,data.height*imgScale));
 	}else if(data.height>canvas.height){
 		// canvas was enlarged downward
