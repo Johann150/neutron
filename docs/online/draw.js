@@ -37,6 +37,7 @@ function setupHandlers(){
 	document.getElementById('redo').onclick=redo;
 	document.getElementById('stroke').oninput=strokeChange;
 	document.getElementById('down').onclick=down;
+	document.getElementById('fullscreen').onclick=toggleFullscreen;
 	window.onscroll=repaintAll;
 	// check when to stop scrolling and/or drawing
 	var end=()=>{
