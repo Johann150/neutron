@@ -607,7 +607,7 @@ function fileSave(closing){
 		eraseWidth:eraseWidth,
 		redoStack:redoStack,
 		width:document.body.clientWidth,
-		height:document.body.clientHeight,
+		height:height,
 		gridColor:(document.body.classList.contains('grid')?gridColor:'transparent')
 	};
 	if(filePath===undefined){
