@@ -124,7 +124,7 @@ function setup(){
 	drawing=false;
 	prevX=0;
 	prevY=0;
-	saved=false;
+	saved=true;
 	height=document.documentElement.clientHeight;
 	scrolled=0;
 	colorchooser=document.createElement('input');
@@ -214,6 +214,7 @@ function down(){
 	}
 	if(scrolled>=getScrollBarMax()){
 		resize(height+100);
+		saved=false;
 	}
 	scrolled=getScrollBarMax();
 	document.getElementById('scroll').style.top=(scrolled*document.documentElement.clientHeight/height)+"px";
@@ -224,6 +225,7 @@ function down(){
 function undo(){
 	if(image.length>0){
 		redoStack.push(image.pop());
+		saved=false;
 		document.getElementById('redo').style.filter="";
 	}
 	repaintAll();
@@ -235,6 +237,7 @@ function undo(){
 function redo(){
 	if(redoStack.length>0){
 		image.push(redoStack.pop());
+		saved=false;
 		document.getElementById('undo').style.filter="";
 	}
 	repaintAll();
@@ -329,6 +332,7 @@ function penClick(){
 			pen.setAttribute('data-old','true');
 			penColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.setProperty("--pen-color",penColor);
+			saved=false;
 			document.getElementById('colours-wrapper').style.display="none";
 		};
 
@@ -337,6 +341,7 @@ function penClick(){
 			colorchooser.onchange=function(evt){
 				penColor=colorchooser.value;
 				document.body.style.setProperty("--pen-color",penColor);
+				saved=false;
 			};
 			pen.setAttribute('data-old','true');
 			document.getElementById('colours-wrapper').style.display="none";
@@ -377,6 +382,7 @@ function strokeChange(){
 	}else{
 		penWidth=stroke;
 	}
+	saved=false;
 }
 
 function bgColorClick(){
@@ -418,8 +424,9 @@ function bgColorClick(){
 		(evt)=>{
 			bgColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.backgroundColor=bgColor;
-			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('bg-color').setAttribute('data-open','false');
+			saved=false;
+			document.getElementById('colours-wrapper').style.display="none";
 		};
 
 		// remove action listener from unused buttons
@@ -431,6 +438,7 @@ function bgColorClick(){
 			colorchooser.onchange=function(evt){
 				document.body.style.backgroundColor=colorchooser.value;
 				bgColor=colorchooser.value;
+				saved=false;
 			};
 			document.getElementById('bg-color').setAttribute('data-open','false');
 			document.getElementById('colours-wrapper').style.display="none";
@@ -478,6 +486,7 @@ function gridClick(evt){
 			document.body.style.setProperty('--grid-color',grid);
 			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('grid').setAttribute('data-old','2');
+			saved=false;
 		};
 
 		// remove action listener from unused buttons
@@ -490,6 +499,7 @@ function gridClick(evt){
 			colorchooser.onchange=function(evt){
 				grid=colorchooser.value;
 				document.body.style.setProperty('--grid-color',grid);
+				saved=false;
 			};
 			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('grid').setAttribute('data-old','2');
