@@ -96,6 +96,13 @@ function setupHandlers(){
 		context.lineWidth=penWidth;
 		repaintAll();
 	};
+	window.onbeforeunload=(e)=>{
+		if(saved){// everything is alright
+			return undefined;
+		}else{
+			e.preventDefault(); // don't close!
+		}
+	};
 }
 
 function setup(){
