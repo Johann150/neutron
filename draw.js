@@ -3,11 +3,11 @@
 const fs=require('fs');
 const path=require('path');
 const url=require('url');
-const {remote,nativeImage}=require('electron');
+const {remote,nativeImage,webFrame}=require('electron');
 const {dialog}=require('electron').remote;
 
 // prevent pinch zooming
-require('electron').webFrame.setZoomLevelLimits(1, 1)
+webFrame.setVisualZoomLevelLimits(1, 1);
 
 var filePath; // file path to use for saving
 
@@ -46,7 +46,7 @@ function setupHandlers(){
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
 	document.querySelector('label[for=grid]').onclick=gridClick;
 	document.getElementById('save-img').onclick=saveImg;
-	document.getElementById('save').onclick=fileSave;
+	document.getElementById('save').onclick=()=>{fileSave(false)};
 	document.getElementById('open').onclick=fileOpen;
 	document.getElementById('undo').onclick=undo;
 	document.getElementById('redo').onclick=redo;
@@ -54,12 +54,19 @@ function setupHandlers(){
 	document.getElementById('down').onclick=down;
 	document.getElementById('quit').onclick=quit;
 	window.onscroll=repaintAll;
-
-	document.onmouseout=document.onmouseup=()=>{
+	// check when to stop scrolling and/or drawing
+	var end=()=>{
 		if(drawing){
 			mouseup();
 		}else if(scrolling!=-1){
 			scrollStop();
+		}
+	};
+	document.onmouseup=canvas.ontouchcancel=end;
+	document.onmouseout=(evt)=>{
+		if(evt.target===window||evt.target===document.documentElement||evt.target===document){
+			// don't do anything if, e.g. the user is hovering over the toolbar or scrollbar while drawing
+			end();
 		}
 	};
 	// handlers for the scrollbar
@@ -90,24 +97,19 @@ function setupHandlers(){
 	canvas.ontouchend=()=>{
 		canvas.onmouseup();
 	};
-	canvas.ontouchcancel=document.onmouseup;
 	// make sure canvas gets resized if window dimension changes
 	// but never reduce the canvas size
-	document.body.onresize=()=>{
-		if(canvas.width+20!==document.documentElement.clientWidth){
-			canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
-			canvas.height=document.documentElement.clientHeight;
-			// get context
-			context=canvas.getContext("2d");
-			// setup context
-			// this enhances line drawing so there are no sudden gaps in the line
-			context.lineJoin="round";
-			context.lineCap="round";
-			context.lineWidth=penWidth;
-			repaintAll();
-		}else{
-			resize(Math.max(canvas.height,document.body.clientHeight));
-		}
+	window.onresize=()=>{
+		canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
+		canvas.height=document.documentElement.clientHeight;
+		// get context
+		context=canvas.getContext("2d");
+		// setup context
+		// this enhances line drawing so there are no sudden gaps in the line
+		context.lineJoin="round";
+		context.lineCap="round";
+		context.lineWidth=penWidth;
+		repaintAll();
 	};
 }
 
@@ -175,7 +177,7 @@ function setup(){
 			quit();
 		}else if(evt.keyCode==83&&evt.ctrlKey){
 			// Ctrl+S
-			fileSave();
+			fileSave(false);
 		}else if(evt.keyCode==79&&evt.ctrlKey){
 			// Ctrl+O
 			fileOpen();
@@ -184,12 +186,6 @@ function setup(){
 			remote.getCurrentWebContents().toggleDevTools();
 		}
 	};
-	// look for default template file
-	if(checkTemplateFile){
-		// this should only happen on startup
-		checkTemplateFile();
-		checkTemplateFile=false;
-	}
 }
 
 /*
@@ -603,7 +599,6 @@ function gridClick(evt){
 }
 
 function fileSave(closing){
-	var closing=(typeof closing!=='undefined')?closing:false;
 	var data={
 		image:image,
 		bg:document.body.style.backgroundColor,
@@ -612,7 +607,7 @@ function fileSave(closing){
 		eraseWidth:eraseWidth,
 		redoStack:redoStack,
 		width:document.body.clientWidth,
-		height:document.body.clientHeight,
+		height:height,
 		gridColor:(document.body.classList.contains('grid')?gridColor:'transparent')
 	};
 	if(filePath===undefined){
@@ -734,13 +729,14 @@ function fileRead(f){
 			switch(btnCode){
 				case 0:
 					// save
-					fileSave();
+					fileSave(false);
 					filePath=f;
-					_fileRead(f);
+					_fileRead(JSON.parse(fs.readFileSync(f)));
 					break;
 				case 1:
 					// discard changes
-					_fileRead(f);
+					filePath=f;
+					_fileRead(JSON.parse(fs.readFileSync(f)));
 					break;
 				case 3:
 					// cancel so do nothing
@@ -748,15 +744,14 @@ function fileRead(f){
 			}
 		});
 	}else{
-		_fileRead(f);
+		_fileRead(JSON.parse(fs.readFileSync(f)));
 	}
 }
 
-function _fileRead(f){
+function _fileRead(data){
 	// reset everything
 	setup();
 	// load data
-	var data=JSON.parse(fs.readFileSync(f));
 	bgColor=rgb2hex(data.bg);
 	if(data.image==null){
 		image=[];
@@ -767,13 +762,14 @@ function _fileRead(f){
 	}
 	if(data.width!=canvas.width){
 		// adjust for different screen size
-		var imgScale=canvas.width/data.width;
-		for(var obj in image){
-			for(var pt in obj.points){
-				pt.x*=imgScale;
-				pt.y*=imgScale;
-			}
-		}
+		var imgScale=document.documentElement.clientWidth/data.width;
+		image=image.map((obj)=>{
+			obj.points=obj.points.map((pt)=>{
+				pt.x*=imgScale;pt.y*=imgScale;
+				return pt;
+			});
+			return obj;
+		});
 		resize(Math.max(data.height,data.height*imgScale));
 	}else if(data.height>canvas.height){
 		// canvas was enlarged downward

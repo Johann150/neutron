@@ -15,6 +15,18 @@ function pointInViewport(point){
 	return (scrolled<=point.y&&point.y<scrolled+document.documentElement.clientHeight);
 }
 
+function toggleFullscreen() {
+	if(!document.fullscreenElement){
+		document.documentElement.requestFullscreen();
+		document.getElementById('fullscreen').src="fullscreen-off.svg";
+	}else{
+		if(document.exitFullscreen){
+			document.exitFullscreen();
+			document.getElementById('fullscreen').src="fullscreen-on.svg";
+		}
+	}
+}
+
 Array.prototype.max = function() {
 	return Math.max.apply(null, this);
 };

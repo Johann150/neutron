@@ -11,6 +11,7 @@ var colorchooser; // DOM element: <input type="color">
 var drawing; // boolean, wether the user is drawing at the moment
 var prevX; // the previous x coordinate when drawing
 var prevY; // the previous y coordinate when drawing
+var saved; // boolean, wether the active state has been modified since the last save
 var grid; // boolean, wether the grid is visisble or not
 var height; // current height of the canvas
 var scrolled; // how far the page is currently scrolled
@@ -30,19 +31,27 @@ function setupHandlers(){
 	document.querySelector('label[for=bg-color]').onclick=bgColorClick;
 	document.querySelector('label[for=grid]').onclick=gridClick;
 	document.getElementById('save-img').onclick=saveImg;
-	// document.getElementById('save').onclick=fileSave;
-	// document.getElementById('open').onclick=fileOpen;
+	document.getElementById('save').onclick=fileSave;
+	document.getElementById('open').onclick=fileOpen;
 	document.getElementById('undo').onclick=undo;
 	document.getElementById('redo').onclick=redo;
 	document.getElementById('stroke').oninput=strokeChange;
 	document.getElementById('down').onclick=down;
+	document.getElementById('fullscreen').onclick=toggleFullscreen;
 	window.onscroll=repaintAll;
-
-	document.onmouseout=document.onmouseup=()=>{
+	// check when to stop scrolling and/or drawing
+	var end=()=>{
 		if(drawing){
 			mouseup();
 		}else if(scrolling!=-1){
 			scrollStop();
+		}
+	};
+	document.onmouseup=canvas.ontouchcancel=end;
+	document.onmouseout=(evt)=>{
+		if(evt.target===window||evt.target===document.documentElement||evt.target===document){
+			// don't do anything if, e.g. the user is hovering over the toolbar or scrollbar while drawing
+			end();
 		}
 	};
 	// handlers for the scrollbar
@@ -73,23 +82,25 @@ function setupHandlers(){
 	canvas.ontouchend=()=>{
 		canvas.onmouseup();
 	};
-	canvas.ontouchcancel=document.onmouseup;
 	// make sure canvas gets resized if window dimension changes
 	// but never reduce the canvas size
-	document.body.onresize=()=>{
-		if(canvas.width+20!==document.documentElement.clientWidth){
-			canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
-			canvas.height=document.documentElement.clientHeight;
-			// get context
-			context=canvas.getContext("2d");
-			// setup context
-			// this enhances line drawing so there are no sudden gaps in the line
-			context.lineJoin="round";
-			context.lineCap="round";
-			context.lineWidth=penWidth;
-			repaintAll();
+	window.onresize=()=>{
+		canvas.width=document.documentElement.clientWidth-20;// subtract scrollbar size
+		canvas.height=document.documentElement.clientHeight;
+		// get context
+		context=canvas.getContext("2d");
+		// setup context
+		// this enhances line drawing so there are no sudden gaps in the line
+		context.lineJoin="round";
+		context.lineCap="round";
+		context.lineWidth=penWidth;
+		repaintAll();
+	};
+	window.onbeforeunload=(e)=>{
+		if(saved){// everything is alright
+			return undefined;
 		}else{
-			resize(Math.max(canvas.height,document.body.clientHeight));
+			e.preventDefault(); // don't close!
 		}
 	};
 }
@@ -113,6 +124,7 @@ function setup(){
 	drawing=false;
 	prevX=0;
 	prevY=0;
+	saved=true;
 	height=document.documentElement.clientHeight;
 	scrolled=0;
 	colorchooser=document.createElement('input');
@@ -202,6 +214,7 @@ function down(){
 	}
 	if(scrolled>=getScrollBarMax()){
 		resize(height+100);
+		saved=false;
 	}
 	scrolled=getScrollBarMax();
 	document.getElementById('scroll').style.top=(scrolled*document.documentElement.clientHeight/height)+"px";
@@ -212,6 +225,7 @@ function down(){
 function undo(){
 	if(image.length>0){
 		redoStack.push(image.pop());
+		saved=false;
 		document.getElementById('redo').style.filter="";
 	}
 	repaintAll();
@@ -223,6 +237,7 @@ function undo(){
 function redo(){
 	if(redoStack.length>0){
 		image.push(redoStack.pop());
+		saved=false;
 		document.getElementById('undo').style.filter="";
 	}
 	repaintAll();
@@ -317,6 +332,7 @@ function penClick(){
 			pen.setAttribute('data-old','true');
 			penColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.setProperty("--pen-color",penColor);
+			saved=false;
 			document.getElementById('colours-wrapper').style.display="none";
 		};
 
@@ -325,6 +341,7 @@ function penClick(){
 			colorchooser.onchange=function(evt){
 				penColor=colorchooser.value;
 				document.body.style.setProperty("--pen-color",penColor);
+				saved=false;
 			};
 			pen.setAttribute('data-old','true');
 			document.getElementById('colours-wrapper').style.display="none";
@@ -365,6 +382,7 @@ function strokeChange(){
 	}else{
 		penWidth=stroke;
 	}
+	saved=false;
 }
 
 function bgColorClick(){
@@ -406,8 +424,9 @@ function bgColorClick(){
 		(evt)=>{
 			bgColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
 			document.body.style.backgroundColor=bgColor;
-			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('bg-color').setAttribute('data-open','false');
+			saved=false;
+			document.getElementById('colours-wrapper').style.display="none";
 		};
 
 		// remove action listener from unused buttons
@@ -419,6 +438,7 @@ function bgColorClick(){
 			colorchooser.onchange=function(evt){
 				document.body.style.backgroundColor=colorchooser.value;
 				bgColor=colorchooser.value;
+				saved=false;
 			};
 			document.getElementById('bg-color').setAttribute('data-open','false');
 			document.getElementById('colours-wrapper').style.display="none";
@@ -466,6 +486,7 @@ function gridClick(evt){
 			document.body.style.setProperty('--grid-color',grid);
 			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('grid').setAttribute('data-old','2');
+			saved=false;
 		};
 
 		// remove action listener from unused buttons
@@ -478,6 +499,7 @@ function gridClick(evt){
 			colorchooser.onchange=function(evt){
 				grid=colorchooser.value;
 				document.body.style.setProperty('--grid-color',grid);
+				saved=false;
 			};
 			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('grid').setAttribute('data-old','2');
