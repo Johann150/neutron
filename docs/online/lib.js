@@ -17,13 +17,27 @@ function pointInViewport(point){
 
 function toggleFullscreen() {
 	if(!document.fullscreenElement){
-		document.documentElement.requestFullscreen();
+		if(document.documentElement.requestFullscreen){
+			document.documentElement.requestFullscreen();
+		}else if(document.documentElement.mozRequestFullScreen){
+			document.documentElement.mozRequestFullScreen();
+		}else if(document.documentElement.webkitRequestFullScreen){
+			document.documentElement.webkitRequestFullScreen();
+		}else if(document.documentElement.msRequestFullscreen){
+			document.documentElement.msRequestFullscreen();
+		}
 		document.getElementById('fullscreen').src="fullscreen-off.svg";
 	}else{
 		if(document.exitFullscreen){
 			document.exitFullscreen();
-			document.getElementById('fullscreen').src="fullscreen-on.svg";
+		}else if(document.mozCancelFullScreen){
+			document.mozCancelFullScreen();
+		}else if(document.webkitCancelFullScreen){
+			document.webkitCancelFullScreen();
+		}else if(document.msExitFullscreen){
+			document.msExitFullscreen();
 		}
+		document.getElementById('fullscreen').src="fullscreen-on.svg";
 	}
 }
 
