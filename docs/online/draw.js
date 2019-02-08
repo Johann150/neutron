@@ -330,7 +330,7 @@ function penClick(){
 		document.getElementById('black').onclick=
 		(evt)=>{
 			pen.setAttribute('data-old','true');
-			penColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
+			penColor=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
 			document.body.style.setProperty("--pen-color",penColor);
 			saved=false;
 			document.getElementById('colours-wrapper').style.display="none";
@@ -422,7 +422,7 @@ function bgColorClick(){
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
-			bgColor=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
+			bgColor=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
 			document.body.style.backgroundColor=bgColor;
 			document.getElementById('bg-color').setAttribute('data-open','false');
 			saved=false;
@@ -482,7 +482,7 @@ function gridClick(evt){
 		document.getElementById('white').onclick=
 		document.getElementById('black').onclick=
 		(evt)=>{
-			grid=rgb2hex(window.getComputedStyle(evt.srcElement).backgroundColor);
+			grid=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
 			document.body.style.setProperty('--grid-color',grid);
 			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('grid').setAttribute('data-old','2');
