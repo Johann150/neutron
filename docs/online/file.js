@@ -32,7 +32,7 @@ function fileSave(){
 	};
 	// make browser download the file
 	var date=new Date();
-	var filename=date.getDate()+"-"+(date.getMonth()+1)+"-"+date.getFullYear()+".png";
+	var filename=date.getDate()+"-"+(date.getMonth()+1)+"-"+date.getFullYear()+".nbrd";
 	var blob=new Blob([JSON.stringify(data)],{type:'application/json'});
 	var url=window.URL.createObjectURL(blob);
 	var anchor=document.createElement('a');
