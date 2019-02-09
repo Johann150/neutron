@@ -59,8 +59,6 @@ function colorchoose(colours,current,handler){
 		if(i>colours.length){
 			// hide this one
 			document.getElementById('colour-'+i).style.display="none";
-			// remove action handler
-			document.getElementById('colour-'+i).onclick=()=>{};
 		}else{
 			// show colour
 			document.getElementById('colour-'+i).style.display="initial";
