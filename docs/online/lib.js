@@ -41,6 +41,56 @@ function toggleFullscreen() {
 	}
 }
 
+function colorchoose(colours,current,handler){
+	// cancel the chooser for pen colour if it was open
+	if(document.getElementById('pen').getAttribute('data-old')=='close'){
+		document.getElementById('pen').setAttribute('data-old','true');
+	}
+	// cancel the chooser for background colour if it was open
+	if(document.getElementById('bg-color').getAttribute('data-open')=='true'){
+		document.getElementById('bg-color').setAttribute('data-open','false');
+	}
+	// cancel the chooser for grid colour if it was open
+	if(document.getElementById('grid').getAttribute('data-open')=='1'){
+		document.getElementById('grid').setAttribute('data-open','0');
+	}
+
+	for(let i=0;i<6;i++){
+		if(i>colours.length){
+			// hide this one
+			document.getElementById('colour-'+i).style.display="none";
+			// remove action handler
+			document.getElementById('colour-'+i).onclick=()=>{};
+		}else{
+			// show colour
+			document.getElementById('colour-'+i).style.display="initial";
+			document.getElementById('colour-'+i).style.backgroundColor=colours[i];
+			// set action handler
+			document.getElementById('colour-'+i).onclick=(evt)=>{
+				let colour=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
+				handler(colour);
+			};
+		}
+	}
+	document.getElementById('white').onclick=
+	document.getElementById('black').onclick=(evt)=>{
+		let colour=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
+		handler(colour);
+	};
+
+	document.getElementById('chooser').onclick=()=>{
+		colorchooser.value=rgb2hex(current);
+		colorchooser.onchange=function(evt){
+			handler(colorchoose.value);
+		};
+		document.getElementById('colours-wrapper').style.display="none";
+		colorchooser.click();
+	}
+
+	// show colour bar
+	document.getElementById('colours-wrapper').style.display="block";
+}
+
 Array.prototype.max = function() {
 	return Math.max.apply(null, this);
 };
