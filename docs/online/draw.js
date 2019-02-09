@@ -392,61 +392,13 @@ function bgColorClick(){
 		document.getElementById('colours-wrapper').style.display="none";
 		btn.setAttribute('data-open','true');
 	}else{
-		// cancel the chooser for pen colour if it was open
-		if(document.getElementById('pen').getAttribute('data-old')=='close'){
-			document.getElementById('pen').setAttribute('data-old','true');
-		}
-		// cancel the chooser for grid colour if it was open
-		if(document.getElementById('grid').getAttribute('data-open')=='1'){
-			document.getElementById('grid').setAttribute('data-open','0');
-		}
-
-		// set colour palette for background
-		document.getElementById('colour-a').style.backgroundColor="#063";
-		document.getElementById('colour-b').style.backgroundColor="#343434";
-		document.getElementById('colour-c').style.backgroundColor="#2C4474";
-		document.getElementById('colour-d').style.backgroundColor="#FCD4A3";
-
-		// show additional colours
-		document.getElementById('colour-c').style.display=
-		document.getElementById('colour-d').style.display="initial";
-
-		// hide unused colours
-		document.getElementById('colour-e').style.display=
-		document.getElementById('colour-f').style.display="none";
-
-		document.getElementById('colour-a').onclick=
-		document.getElementById('colour-b').onclick=
-		document.getElementById('colour-c').onclick=
-		document.getElementById('colour-d').onclick=
-		document.getElementById('white').onclick=
-		document.getElementById('black').onclick=
-		(evt)=>{
-			bgColor=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
+		colourchoose(["#063","#343434","#2C4474","#FCD4A3"],document.body.style.backgroundColor,(colour)=>{
+			bgColor=colour;
 			document.body.style.backgroundColor=bgColor;
 			document.getElementById('bg-color').setAttribute('data-open','false');
 			saved=false;
-			document.getElementById('colours-wrapper').style.display="none";
-		};
-
-		// remove action listener from unused buttons
-		document.getElementById('colour-e').onclick=
-		document.getElementById('colour-f').onclick=()=>{};
-
-		document.getElementById('chooser').onclick=()=>{
-			colorchooser.value=rgb2hex(document.body.style.backgroundColor);
-			colorchooser.onchange=function(evt){
-				document.body.style.backgroundColor=colorchooser.value;
-				bgColor=colorchooser.value;
-				saved=false;
-			};
-			document.getElementById('bg-color').setAttribute('data-open','false');
-			document.getElementById('colours-wrapper').style.display="none";
-			colorchooser.click();
-		}
-
-		document.getElementById('bg-color').setAttribute('data-open','true');
-		document.getElementById('colours-wrapper').style.display="block";
+		});
+		btn.setAttribute('data-open','true');
 	}
 }
 
