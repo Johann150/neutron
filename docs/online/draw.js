@@ -294,60 +294,15 @@ function repaintAll(){
 function penClick(){
 	var pen=document.getElementById('pen');
 	if(pen.getAttribute('data-old')=='true'){
-		// cancel the chooser for background colour if it was open
-		if(document.getElementById('bg-color').getAttribute('data-open')=='true'){
-			document.getElementById('bg-color').setAttribute('data-open','false');
-		}
-		// cancel the chooser for grid colour if it was open
-		if(document.getElementById('grid').getAttribute('data-open')=='1'){
-			document.getElementById('grid').setAttribute('data-open','0');
-		}
-
 		// pen was already activated, user wants to change color
 		pen.setAttribute('data-old','close');
 
-		// set colour palette for pen
-		document.getElementById('colour-a').style.backgroundColor="#dd0622";
-		document.getElementById('colour-b').style.backgroundColor="#f8ba00";
-		document.getElementById('colour-c').style.backgroundColor="#2676cc";
-		document.getElementById('colour-d').style.backgroundColor="#0cfc04";
-		document.getElementById('colour-e').style.backgroundColor="#b41c74";
-		document.getElementById('colour-f').style.backgroundColor="#ccd4d4";
-
-		// show additional colours
-		document.getElementById('colour-c').style.display=
-		document.getElementById('colour-d').style.display=
-		document.getElementById('colour-e').style.display=
-		document.getElementById('colour-f').style.display="initial";
-
-		document.getElementById('colour-a').onclick=
-		document.getElementById('colour-b').onclick=
-		document.getElementById('colour-c').onclick=
-		document.getElementById('colour-d').onclick=
-		document.getElementById('colour-e').onclick=
-		document.getElementById('colour-f').onclick=
-		document.getElementById('white').onclick=
-		document.getElementById('black').onclick=
-		(evt)=>{
+		colourchoose(["#dd0622","#f8ba00","#2676cc","#0cfc04","#b41c74","#ccd4d4"],context.strokeStyle,(colour)=>{
 			pen.setAttribute('data-old','true');
-			penColor=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
+			penColor=colour;
 			document.body.style.setProperty("--pen-color",penColor);
 			saved=false;
-			document.getElementById('colours-wrapper').style.display="none";
-		};
-
-		document.getElementById('chooser').onclick=()=>{
-			colorchooser.value=context.strokeStyle;
-			colorchooser.onchange=function(evt){
-				penColor=colorchooser.value;
-				document.body.style.setProperty("--pen-color",penColor);
-				saved=false;
-			};
-			pen.setAttribute('data-old','true');
-			document.getElementById('colours-wrapper').style.display="none";
-			colorchooser.click();
-		}
-		document.getElementById('colours-wrapper').style.display="block";
+		});
 	}else if(pen.getAttribute('data-old')=='close'){
 		// dismiss colour chooser
 		document.getElementById('colours-wrapper').style.display="none";
