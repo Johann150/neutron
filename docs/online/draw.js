@@ -361,59 +361,16 @@ function gridClick(evt){
 	evt.preventDefault();
 	var g=document.getElementById('grid');
 	if(g.getAttribute('data-old')=='0'){
-		// cancel the chooser for pen colour if it was open
-		if(document.getElementById('pen').getAttribute('data-old')=='close'){
-			document.getElementById('pen').setAttribute('data-old','true');
-		}
-		// cancel the chooser for background colour if it was open
-		if(document.getElementById('bg-color').getAttribute('data-open')=='true'){
-			document.getElementById('bg-color').setAttribute('data-open','false');
-		}
-
 		// grid was already activated, user wants to change color
 		g.setAttribute('data-old','1');
 
-		// set colour palette for grid
-		document.getElementById('colour-a').style.backgroundColor="#eaeaea";
-		document.getElementById('colour-b').style.backgroundColor="#4c4c4c";
-		document.getElementById('colour-c').style.backgroundColor="#096";
-
-		// hide unused colours
-		document.getElementById('colour-d').style.display=
-		document.getElementById('colour-e').style.display=
-		document.getElementById('colour-f').style.display="none";
-
-		document.getElementById('colour-a').onclick=
-		document.getElementById('colour-b').onclick=
-		document.getElementById('colour-c').onclick=
-		document.getElementById('white').onclick=
-		document.getElementById('black').onclick=
-		(evt)=>{
-			grid=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
+		colourchoose([],grid,(colour)=>{
+			grid=colour;
 			document.body.style.setProperty('--grid-color',grid);
-			document.getElementById('colours-wrapper').style.display="none";
 			document.getElementById('grid').setAttribute('data-old','2');
 			saved=false;
-		};
+		});
 
-		// remove action listener from unused buttons
-		document.getElementById('colour-d').onclick=
-		document.getElementById('colour-e').onclick=
-		document.getElementById('colour-f').onclick=()=>{};
-
-		document.getElementById('chooser').onclick=()=>{
-			colorchooser.value=rgb2hex(grid);
-			colorchooser.onchange=function(evt){
-				grid=colorchooser.value;
-				document.body.style.setProperty('--grid-color',grid);
-				saved=false;
-			};
-			document.getElementById('colours-wrapper').style.display="none";
-			document.getElementById('grid').setAttribute('data-old','2');
-			evt.preventDefault();
-			colorchooser.click();
-		}
-		document.getElementById('colours-wrapper').style.display="block";
 		g.checked=true;
 	}else if(g.getAttribute('data-old')=='1'){
 		// dismiss colour chooser
