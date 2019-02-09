@@ -2,6 +2,13 @@ function getScrollBarMax(){
 	return height-document.documentElement.clientHeight;
 }
 
+function colourInputSupport(){
+	let i=document.createElement("input");
+	i.setAttribute("type","color");
+	// if this type is not supported, the browser will reset the type to "text"
+	return i.type!=="text";
+}
+
 function rgb2hex(rgb){
 	rgb = rgb.match(/^rgba?[\s+]?\([\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?,[\s+]?(\d+)[\s+]?/i);
 	return (rgb && rgb.length === 4) ? "#" +

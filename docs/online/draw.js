@@ -143,6 +143,11 @@ function setup(){
 	resize(document.documentElement.clientHeight);
 	context.lineWidth=penWidth;
 	context.clearRect(0,0,canvas.width,canvas.height);
+	// check for colorchooser support
+	if(!colourInputSupport()){
+		// the browser based colour chooser is not supported
+		document.getElementById('chooser').style.display="none";
+	}
 	setupHandlers();
 }
 
