@@ -364,7 +364,7 @@ function gridClick(evt){
 		// grid was already activated, user wants to change color
 		g.setAttribute('data-old','1');
 
-		colourchoose([],grid,(colour)=>{
+		colourchoose(["#eaeaea","#4c4c4c","#096"],grid,(colour)=>{
 			grid=colour;
 			document.body.style.setProperty('--grid-color',grid);
 			document.getElementById('grid').setAttribute('data-old','2');

@@ -41,7 +41,7 @@ function toggleFullscreen() {
 	}
 }
 
-function colorchoose(colours,current,handler){
+function colourchoose(colours,current,handler){
 	// cancel the chooser for pen colour if it was open
 	if(document.getElementById('pen').getAttribute('data-old')=='close'){
 		document.getElementById('pen').setAttribute('data-old','true');
@@ -65,6 +65,7 @@ function colorchoose(colours,current,handler){
 			document.getElementById('colour-'+i).style.backgroundColor=colours[i];
 			// set action handler
 			document.getElementById('colour-'+i).onclick=(evt)=>{
+				document.getElementById('colours-wrapper').style.display="none";
 				let colour=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
 				handler(colour);
 			};
@@ -72,6 +73,7 @@ function colorchoose(colours,current,handler){
 	}
 	document.getElementById('white').onclick=
 	document.getElementById('black').onclick=(evt)=>{
+		document.getElementById('colours-wrapper').style.display="none";
 		let colour=rgb2hex(window.getComputedStyle(evt.target).backgroundColor);
 		handler(colour);
 	};
@@ -79,7 +81,7 @@ function colorchoose(colours,current,handler){
 	document.getElementById('chooser').onclick=()=>{
 		colorchooser.value=rgb2hex(current);
 		colorchooser.onchange=function(evt){
-			handler(colorchoose.value);
+			handler(colorchooser.value);
 		};
 		document.getElementById('colours-wrapper').style.display="none";
 		colorchooser.click();
