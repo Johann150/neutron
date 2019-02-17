@@ -15,6 +15,7 @@ var saved; // boolean, wether the active state has been modified since the last 
 var grid; // boolean, wether the grid is visisble or not
 var height; // current height of the canvas
 var scrolled; // how far the page is currently scrolled
+var isFullscreen;
 
 function resize(h){
 	// check that the body isn't already the right size
@@ -122,6 +123,7 @@ function setup(){
 	eraseWidth=50;
 	document.getElementById('stroke').value=penWidth;
 	drawing=false;
+	isFullscreen=false;
 	prevX=0;
 	prevY=0;
 	saved=true;

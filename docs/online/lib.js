@@ -22,8 +22,8 @@ function pointInViewport(point){
 	return (scrolled<=point.y&&point.y<scrolled+document.documentElement.clientHeight);
 }
 
-function toggleFullscreen() {
-	if(!document.fullscreenElement){
+function toggleFullscreen(){
+	if(!isFullscreen){
 		if(document.documentElement.requestFullscreen){
 			document.documentElement.requestFullscreen();
 		}else if(document.documentElement.mozRequestFullScreen){
@@ -46,6 +46,7 @@ function toggleFullscreen() {
 		}
 		document.getElementById('fullscreen').src="fullscreen-on.svg";
 	}
+	isFullscreen=!isFullscreen;
 }
 
 function colourchoose(colours,current,handler){
