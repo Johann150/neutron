@@ -1,51 +1,232 @@
-<!DOCTYPE html>
+<!DOCTYPE HTML>
+<!--
+	Stellar by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+-->
 <html>
 	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="Content-Security-Policy" content="script-src 'self'">
-		<title>Neutron</title>
-		<link rel="icon" type="image/svg+xml" href="atoms.svg"/>
-		<link rel="stylesheet" type="text/css" href="index.css"/>
+		<title>Neutron - Back to the rules</title>
+		<meta charset="utf-8" />
+		<base href="https://johann150.github.io/neutron/">
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<link rel="stylesheet" href="assets/css/github-corner.css"/>
 	</head>
 	<body>
-		<aside id="toolbox">
-			<input type="radio" class="toggle" id="pen" name="drawing" checked data-old="true"/>
-			<label for="pen"><img src="stift.svg" alt="&#10000;"/></label>
-			<input type="radio" class="toggle" id="erase" name="drawing"/>
-			<label for="erase"><img src="schwamm.svg" alt="Schwamm"></label>
-			<input type="radio" id="bg-color"/>
-			<label for="bg-color"><img src="bg.svg" alt="Hintergr.-Farbe"/></label>
-			<input type="checkbox" class="toggle" id="grid" data-old="3"/>
-			<label for="grid"><img src="grid.svg" alt="Kästchen"/></label>
-			<input type="image" id="save-img" src="save.svg" alt="Bild speichern"/>
-			<input type="image" id="save" src="save2.svg" alt="Speichern"/>
-			<input type="image" id="open" src="open.svg" alt="Öffnen"/>
-			<input type="image" id="undo" src="back.svg" alt="&#8630;"/>
-			<input type="image" id="redo" src="next.svg" alt="&#8631;"/>
-			<input type="range" id="stroke" min="2" max="50" value="1"/>
-			<input type="image" id="down" src="down.svg" alt="&dArr;"/>
-			<input type="image" id="quit" src="exit.svg" alt="Beenden"/>
-		</aside>
-		<div id="colours-wrapper">
-			<div id="colours">
-				<input type="button" id="colour-a" />
-				<input type="button" id="colour-b" />
-				<input type="button" id="colour-c" />
-				<input type="button" id="colour-d" />
-				<input type="button" id="colour-e" />
-				<input type="button" id="colour-f" />
-				<input type="button" id="white" />
-				<input type="button" id="black" />
-				<input type="button" id="chooser" />
+		<a href="https://github.com/Johann150/neutron" class="github-corner" aria-label="auf GitHub anzeigen">
+			<svg width="80" height="80" viewBox="0 0 250 250" style="fill:#151513; color:#fff; position: absolute; top: 0; border: 0; right: 0;" aria-hidden="true">
+				<path d="M0,0 L115,115 L130,115 L142,142 L250,250 L250,0 Z"></path>
+				<path d="M128.3,109.0 C113.8,99.7 119.0,89.6 119.0,89.6 C122.0,82.7 120.5,78.6 120.5,78.6 C119.2,72.0 123.4,76.3 123.4,76.3 C127.3,80.9 125.5,87.3 125.5,87.3 C122.9,97.6 130.6,101.9 134.4,103.2" fill="currentColor" style="transform-origin: 130px 106px;" class="octo-arm"></path>
+				<path d="M115.0,115.0 C114.9,115.1 118.7,116.5 119.8,115.4 L133.7,101.6 C136.9,99.2 139.9,98.4 142.2,98.6 C133.8,88.0 127.5,74.4 143.8,58.0 C148.5,53.4 154.0,51.2 159.7,51.0 C160.3,49.4 163.2,43.6 171.4,40.1 C171.4,40.1 176.1,42.5 178.8,56.2 C183.1,58.6 187.2,61.8 190.9,65.4 C194.5,69.0 197.7,73.2 200.1,77.6 C213.8,80.2 216.3,84.9 216.3,84.9 C212.7,93.1 206.9,96.0 205.4,96.6 C205.1,102.4 203.0,107.8 198.3,112.5 C181.9,128.9 168.3,122.5 157.7,114.1 C157.9,116.9 156.7,120.9 152.7,124.9 L141.0,136.5 C139.8,137.7 141.6,141.9 141.8,141.8 Z" fill="currentColor" class="octo-body"></path>
+			</svg>
+		</a>
+		<div id="wrapper">
+			<div id="languages">
+				<a href="#" class="button special">English</a>
+				<a href="de/index.html" class="button">Deutsch</a>
 			</div>
+
+			<header id="header" class="alt">
+				<span class="logo"><img src="images/logo.svg" style="width:100px;height:100px;" alt="Neutron logo" /></span>
+				<h1>Neutron.</h1>
+				<p>whiteboard software<br />
+				built by <a href="https://github.com/johann150">@Johann150</a> and designed by <a href="https://github.com/vonMitzscha">@vonMitzscha</a>.</p>
+			</header>
+
+			<nav id="nav">
+				<ul>
+					<li><a href="#intro" class="active">Introduction</a></li>
+					<li><a href="#functions">Functions</a></li>
+					<li><a href="#info">Additional Information</a></li>
+					<li><a href="#cta">Get Started</a></li>
+					<li><a href="#help">Help</a></li>
+					<li><a href="security.html">Privacy Policy</a>
+				</ul>
+			</nav>
+
+			<div id="main">
+				<section id="intro" class="main">
+					<div class="spotlight">
+						<div class="content">
+							<header class="major">
+								<h2>A simple way to educate digitally.</h2>
+							</header>
+							<p>
+								Neutron is an application for windows-based whiteboards. With this software it is possible to educate in the time of digitisation without sparing one of the most important tools: <strong>The blackboard</strong>.
+							</p>
+							<p>
+								Neutron is not a crowded and cramped application, but is a user-friendly alternative to software like ActiveInspire or similar software products.
+							</p>
+							<p>
+								With Neutron, it is possible to give teachers a chance to educate in a very simple but modern way, without completely changing the way of teaching and sparing the most important tool. So it is nothing new, only getting back to the rules.
+							</p>
+							<p>
+								Neutron has been developed especially with teachers in mind that might have difficulties adjusting to electronic whiteboards. It has been developed by students and tested by their teachers. We took common frustrations from other programs as an inspiration
+							</p>
+							<ul class="actions">
+								<li><a href="#cta" class="button">Get Started</a></li>
+								<li><a href="https://johann150.github.io/neutron/manual.pdf" class="button special">Read the user manual</a></li>
+							</ul>
+						</div>
+						<span class="image"><img src="images/logo.svg" alt="Neutron logo" /></span>
+					</div>
+				</section>
+
+				<section id="functions" class="main special">
+					<header class="major">
+						<h2>Functions.</h2>
+					</header>
+					<ul class="features">
+						<li>
+							<span class="icon major style1 fa-desktop"></span>
+							<h3>Desktop and Browser.</h3>
+							<p>Neutron is built for modern browsers and as a desktop app.</p>
+						</li>
+						<li>
+							<span class="icon major style3 fa-pencil"></span>
+							<h3>Drawing & Painting.</h3>
+							<p>Easy writing and drawing on the whiteboard with the pencil tool.</p>
+						</li>
+						<li>
+							<span class="icon major style5 fa-eraser"></span>
+							<h3>Erase.</h3>
+							<p>Erase writings and drawings easily with the eraser tool.</p>
+						</li>
+						<li>
+							<span class="icon major style2 fa-paint-brush"></span>
+							<h3>Background.<sup>1</sup></h3>
+							<p>Change the background colour to every colour you want. On the desktop variant you will hopefully soon be able to use complete background images.</p>
+						</li>
+						<li>
+							<span class="icon major style4 fa-floppy-o"></span>
+							<h3>Saving.<sup>2</sup></h3>
+							<p>To keep track of your lessons, save the current board or export it as a PNG image file.</p>
+						</li>
+						<li>
+							<span class="icon major style1 fa-folder-open"></span>
+							<h3>Open.<sup>2</sup></h3>
+							<p>Open saved boards so you can continue where you left off.</p>
+						</li>
+					</ul>
+					<footer class="major">
+						<p>
+							<sup>1</sup> This feature is only partially supported in the online variant as mentioned.
+							<br>
+							<sup>2</sup> This feature is not supported in the online variant.
+						</p>
+						<ul class="actions">
+							<li><a href="#cta" class="button">Get Started</a></li>
+						</ul>
+					</footer>
+				</section>
+
+				<section id="info" class="main special">
+					<header class="major">
+						<h2>Additional Information.</h2>
+						<p>Neutron is a browser based application and was also developed using Electron.</p>
+					</header>
+					<ul class="statistics">
+						<li class="style1">
+							<span class="icon fa-desktop"></span>
+							<strong>Electron</strong> desktop framework
+						</li>
+						<li class="style2">
+							<span class="icon fa-firefox"></span>
+							<strong>online</strong> browser based
+						</li>
+						<li class="style3">
+							<span class="icon fa-lock"></span>
+							<strong>Secure</strong> no additional stored data
+						</li>
+						<li class="style4">
+							<span class="icon fa-github"></span>
+							<strong>GitHub</strong> open source
+						</li>
+					</ul>
+					<p class="content">
+						Neutron is in development by the GitHub community and was initiated by Johann150.
+						The aim of the application is being a simple, modern and user-friendly alterative to similar software like ActiveInspire by Promethan.
+						With Neutron you can create a beautiful board in short time and with small effort and and at the same time you support the digitization of education.
+						We as developers are aware that education software must always have a high level of privacy.
+						This is why Neutron does not store any information, cookies, drawings or user data without you asking for it.
+						"Asking for it" referring to the saving feature.
+					</p>
+					<footer class="major">
+						<ul class="actions">
+							<li><a href="security.html" class="button">Privacy Policy</a></li>
+						</ul>
+					</footer>
+				</section>
+
+				<section id="cta" class="main special">
+					<header class="major">
+						<h2>Get Started.</h2>
+						<p>Download Neutron today or start using it immediately in the browser and support the user-friendly digitization of education without major training.</p>
+					</header>
+					<footer class="major">
+						<ul class="actions">
+							<li><a href="https://github.com/Johann150/neutron/releases" class="button special">Download</a></li>
+							<li><a href="https://johann150.github.io/neutron/online" class="button">Open in browser</a></li>
+						</ul>
+					</footer>
+				</section>
+
+				<section id="help" class="main special">
+					<header class="major">
+						<h2>Help!</h2>
+						<p>If something is not quite right.</p>
+					</header>
+					<p class="content">
+						<div style="color:white;background-color:grey;border-radius:5px;margin:5px;">I am using an operating system other than Windows.</div>
+						It should be possible to overcome that problem.
+						But the solution might get a bit techy.
+						Please keep in mind that all steps taken by you are at your own risk.<br>
+					</p>
+					<ul>
+						<li>First, you will have to install <a href="https://nodejs.org/">NodeJS</a>. If there is no support for NodeJS on your operating system, we are sorry that we cannot help you out.</li>
+						<li>You will also have to download the neutron repository. For this you can either use <span style="font-family:monospace;">git</span> or just download a zip file from the repository website.</li>
+						<li>After finishing both of those and, if required, unpacking the zip file, you have to run <span style="font-family:monospace;">npm run dist</span> in the directory where you cloned/unziped to.</li>
+						<li>And you are done: There should be a file/folder created depending on your operating system.</li>
+					</ul>
+					<footer>
+
+					</footer>
+				</section>
+			</div>
+
+			<footer id="footer">
+				<section>
+					<h2>A simple way to educate digitally.</h2>
+					<p>Neutron is an application for windows based whiteboards. With this software it is possible to educate in the time of digitisation without sparing one of the most important tools: <stong>The blackboard</strong>.</p>
+					<ul class="actions">
+						<li><a href="https://github.com/Johann150/neutron" class="button"><span class="icon fa-github"> View on GitHub</a></li>
+					</ul>
+				</section>
+				<section>
+					<h2>Contact</h2>
+					<dl class="alt">
+						<dt>Country</dt>
+						<dd>Germany</dd>
+						<dt>City</dt>
+						<dd>Dresden</dd>
+						<dt>Email</dt>
+						<dd><a>support.mitzscherling{at}protonmail.com</a></dd>
+					</dl>
+				</section>
+				<p class="copyright">Basic-Design by <a href="https://html5up.net">HTML5 UP</a>.</p>
+			</footer>
 		</div>
-		<canvas id="canvas"></canvas>
-		<div id="erase-cur" style="display:none;"></div>
-		<div id="scrollbar">
-			<div id="scroll"></div>
-		</div>
-		<script src="lib.js"></script>
-		<script src="mouse.js"></script>
-		<script src="draw.js"></script>
+
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/jquery.scrollex.min.js"></script>
+		<script src="assets/js/jquery.scrolly.min.js"></script>
+		<script src="assets/js/skel.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="assets/js/main.js"></script>
 	</body>
 </html>
