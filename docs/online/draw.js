@@ -75,13 +75,15 @@ function setupHandlers(){
 	canvas.onmouseup=drawStop;
 	// touch handlers
 	canvas.ontouchstart=(evt)=>{
-		canvas.onmousedown(evt.touches[0]);
+		document.getElementById('canvas').style.cursor="none";
+		canvas.onmousedown(evt.touches[0],true);
 	};
 	canvas.ontouchmove=(evt)=>{
 		canvas.onmousemove(evt.touches[0]);
 	};
 	canvas.ontouchend=()=>{
 		canvas.onmouseup();
+		document.getElementById('canvas').style.cursor="url(pen.cur),crosshair";
 	};
 	// make sure canvas gets resized if window dimension changes
 	// but never reduce the canvas size
