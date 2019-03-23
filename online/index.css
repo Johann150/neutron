@@ -11,7 +11,6 @@ body{
 	overflow:hidden;
 	background-color:#063;
 	background-size:cover !important;
-	cursor:pointer;
 	-webkit-user-select:none;
 	user-select:none;
 }
@@ -72,7 +71,6 @@ input#bg{
 	padding:2px;
 	box-sizing:border-box;
 	overflow:hidden;
-	cursor:pointer;
 }
 #toolbox #stroke{
 	width:122px;
@@ -80,7 +78,7 @@ input#bg{
 canvas{
 	display:block;
 	position:fixed;
-	cursor:url(pen.cur),crosshair;
+	cursor:pointer;
 	z-index:0;
 }
 #bg-color,

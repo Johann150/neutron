@@ -123,7 +123,7 @@ function penClick(){
 		pen.setAttribute('data-old','true');
 		document.getElementById('stroke').value=penWidth;
 		document.getElementById('erase-cur').style.display="none";
-		document.getElementById('canvas').style.cursor="url(pen.cur),crosshair";
+		document.getElementById('canvas').style.cursor="";
 	}
 }
 
